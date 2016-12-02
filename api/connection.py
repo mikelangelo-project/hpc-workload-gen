@@ -58,7 +58,7 @@ class HLRS(object):
                     # slice the header and the last line which is empty
                     jobs_displayed = ssh_output.split('\n')[2:-1]
                     for job in jobs_displayed:
-                        # remove whitespaces
+                        # remove whitespace
                         job_info = ' '.join(job.split())
                         # split into stuff
                         (job_id,
@@ -131,8 +131,10 @@ class HLRS(object):
         """Submit the job to qsub, returns job_id."""
         self.logger.info('Submitting job ...')
 
-        job_script_path = '~/experiments/'
-        job_script_path += workload_generator.get_params('experiment_dir')
+        job_script_path = '~/'
+        job_script_path += str(
+            workload_generator.get_params('experiment_dir')
+        ).replace('./', '')  # removing possible ./ in the beginning
         job_script_path += '/'
         job_script_path += workload_generator.get_params('job_script_name')
 
@@ -141,7 +143,6 @@ class HLRS(object):
         self.logger.debug('arg_liste: %s' % arg_list)
 
         try:
-            # self.logger.info('contact qsub without Feature')
             self.logger.debug(
                 '/opt/dev/HPC-Integration/src/qsub %s' % arg_list)
 
@@ -173,7 +174,7 @@ class HLRS(object):
 
     def move_input(self, workload_generator):
         """Move the input files to the remote system."""
-        remote_path = 'vsbase2:~/experiments/'
+        remote_path = 'vsbase2:~/'
         job_script_dir_path = workload_generator.get_params('experiment_dir')
 
         # remove last / from input path

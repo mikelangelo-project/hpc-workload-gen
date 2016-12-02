@@ -1,6 +1,5 @@
 # required packages 
 
 logging
-getopt
 sh
-yaml
+pyyaml
