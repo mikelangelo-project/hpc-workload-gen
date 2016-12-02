@@ -174,7 +174,6 @@ class HLRS(object):
 
     def move_input(self, workload_generator):
         """Move the input files to the remote system."""
-        remote_path = 'vsbase2:~/'
         job_script_dir_path = workload_generator.get_params('experiment_dir')
 
         # remove last / from input path
@@ -183,6 +182,7 @@ class HLRS(object):
             job_script_dir_path = job_script_dir_path[:-1]
             self.logger.info('new path is %s' % job_script_dir_path)
 
+        remote_path = 'vsbase2:~/test'
         # move job script
         self.logger.info(
             'moving date from %s to %s' % (job_script_dir_path, remote_path))
