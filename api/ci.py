@@ -29,9 +29,9 @@ import yaml
 class Workload(object):
     """Class for Workload configuration."""
 
-    def __init__(self, yuml_file='workload.yml', debug_lvl='DEBUG'):
+    def __init__(self, yuml_file='workload.yml', datadir=''):
         """Initialize this Class."""
-        self.logger = self.__get_logger(debug_lvl)
+        self.logger = self.__get_logger()
         self.logger.debug('Initialize class')
 
         self.workload_YAML_file = yuml_file
@@ -48,8 +48,9 @@ class Workload(object):
             self.logger.info('no vTorque keys in yaml.')
             self.logger.debug('set self.vtorque to None')
             self.vtorque = None
+        self.datadir = datadir
 
-    def __get_logger(self, debug_lvl):
+    def __get_logger(self):
         """Setup the global logger."""
         # log setup
         logger = logging.getLogger(__name__)
@@ -196,3 +197,9 @@ class Workload(object):
             self.logger.info('no parameter for vTorque stuff')
             self.logger.debug('returning None')
             return None
+
+    def get_data_dir(self):
+        """Getter for base directory."""
+        return_str = self.datadir + self.get_params('experiment_dir')
+        self.logger.debug('returning data directory: %s' % return_str)
+        return return_str
