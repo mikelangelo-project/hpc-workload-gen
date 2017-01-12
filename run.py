@@ -47,10 +47,10 @@ def get_logger():
     return logger
 
 
-def stage_in(conn, workload_generator, logger):
+def stage_in(conn, workload_generator, datadir, logger):
     """Move job files to the remote system, prepare everything."""
     logger.info('Starting stage in')
-    conn.move_input(workload_generator)
+    conn.move_input(workload_generator, datadir)
 
 
 def run_test(conn, workload_generator, logger):
@@ -100,7 +100,7 @@ def main(workload, datadir):
     conn = HLRS()
 
     # moving files
-    stage_in(conn, workload_generator, logger)
+    stage_in(conn, workload_generator, datadir, logger)
 
     # runing workload
     job_id = run_test(conn, workload_generator, logger)

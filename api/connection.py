@@ -161,11 +161,11 @@ class HLRS(object):
 
         try:
             self.logger.debug(
-                '/opt/dev/HPC-Integration/src/qsub %s' % arg_list)
+                '/opt/dev/vTorque/src/qsub %s' % arg_list)
 
             # Job submit
             ssh_output = self.host(
-                '/opt/dev/HPC-Integration/src/qsub',
+                '/opt/dev/vTorque/src/qsub',
                 *arg_list)
 
             self.logger.debug('ssh return code: %s' % ssh_output.exit_code)
@@ -189,9 +189,10 @@ class HLRS(object):
             print e.stderr
             exit(1)
 
-    def move_input(self, workload_generator):
+    def move_input(self, workload_generator, datadir):
         """Move the input files to the remote system."""
-        job_script_dir_path = workload_generator.get_params('experiment_dir')
+        job_script_dir_path = datadir + '/'
+        job_script_dir_path += workload_generator.get_params('experiment_dir')
 
         # remove last / from input path
         if job_script_dir_path.endswith('/'):
@@ -199,7 +200,7 @@ class HLRS(object):
             job_script_dir_path = job_script_dir_path[:-1]
             self.logger.info('new path is %s' % job_script_dir_path)
 
-        remote_path = 'vsbase2:~/test'
+        remote_path = 'vsbase2:~/'
         # move job script
         self.logger.info(
             'moving date from %s to %s' % (job_script_dir_path, remote_path))
