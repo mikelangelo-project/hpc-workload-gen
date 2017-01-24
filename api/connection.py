@@ -195,15 +195,19 @@ class HLRS(object):
         job_script_dir_path += workload_generator.get_params('experiment_dir')
 
         # remove last / from input path
-        if job_script_dir_path.endswith('/'):
-            self.logger.info('removing / in %s' % job_script_dir_path)
-            job_script_dir_path = job_script_dir_path[:-1]
+        if not job_script_dir_path.endswith('/'):
+            self.logger.info('adding / in %s' % job_script_dir_path)
+            job_script_dir_path = job_script_dir_path + '/'
             self.logger.info('new path is %s' % job_script_dir_path)
 
         remote_path = 'vsbase2:~/'
+        remote_path += workload_generator.get_params('experiment_dir')
         # move job script
         self.logger.info(
             'moving date from %s to %s' % (job_script_dir_path, remote_path))
+        # create remote dir first
+        self.host(
+            "mkdir", "-p", workload_generator.get_params('experiment_dir'))
         rsync_output = rsync(
             "-azv", "--delete", job_script_dir_path, remote_path)
 
