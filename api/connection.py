@@ -32,10 +32,11 @@ class HLRS(object):
 
     def __init__(self):
         """Initialize connection object."""
-        self.logger = self.__get_logger()
+        self.logger = self._get_logger()
         self.host = ssh.bake('-n', 'vsbase2')
+        self.job_id = ''  # init empty first
 
-    def __get_logger(self):
+    def _get_logger(self):
         """Setup the global logger."""
         # log setup
         logger = logging.getLogger(__name__)
@@ -53,11 +54,11 @@ class HLRS(object):
         logger.debug('Logger setup complete. Start Program ... ')
         return logger
 
-    def wait_for_job(self, job_id):
+    def wait_for_job(self):
         """Wait for the job to finish."""
         job_running = True
 
-        self.logger.info('Start waiting for job %s' % job_id)
+        self.logger.info('Start waiting for job %s' % self.job_id)
 
         while job_running:
             self.logger.info('sleeping for x seconds\n\n')
@@ -65,7 +66,7 @@ class HLRS(object):
             try:
                 self.logger.debug('getting qstat infos')
                 ssh_output = self.host(
-                    "/opt/torque/current/server/bin/qstat", job_id)
+                    "/opt/torque/current/server/bin/qstat", self.job_id)
 
                 self.logger.debug('ssh return code: %s' % ssh_output.exit_code)
                 self.logger.debug('type of the return %s' % type(ssh_output))
@@ -78,31 +79,32 @@ class HLRS(object):
                         # remove whitespace
                         job_info = ' '.join(job.split())
                         # split into stuff
-                        (job_id,
+                        (self.job_id,
                             job_name,
                             job_user,
                             job_time,
                             job_status,
                             job_queue) = job_info.split(' ')
                         self.logger.debug(
-                            'job %s has status %s' % (job_id, job_status))
+                            'job %s has status %s' % (self.job_id, job_status))
                         if job_status == 'R' or job_status == 'S':
                             self.logger.debug(
-                                '%s is running or scheduled' % job_id)
+                                '%s is running or scheduled' % self.job_id)
                         elif job_status == 'E':
                             self.logger.debug(
-                                '%s is ended, waiting for complete.' % job_id)
+                                '%s is ended, waiting for complete.'
+                                % self.job_id)
                         elif job_status == 'C':
                             self.logger.debug(
-                                '%s is complete. exit loop' % job_id)
+                                '%s is complete. exit loop' % self.job_id)
                             job_running = False
                         else:
                             self.logger.error(
                                 '%s in an unknown stat %s' % (
-                                    job_id, job_status))
+                                    self.job_id, job_status))
                 else:
                     self.logger.debug(
-                        'no job %s found, amuse finished' % job_id)
+                        'no job %s found, amuse finished' % self.job_id)
                     job_running = False
 
             except ErrorReturnCode as e:
@@ -112,7 +114,7 @@ class HLRS(object):
 
         self.logger.info('Job finished. Unblocking now.')
 
-    def __build_qsub_args(self, workload_generator):
+    def _build_qsub_args(self, workload_generator):
         """Build a list of arguments passed to qsub."""
         arg_list = []
         self.logger.info('arg_list building arg_list')
@@ -155,7 +157,7 @@ class HLRS(object):
         job_script_path += '/'
         job_script_path += workload_generator.get_params('job_script_name')
 
-        arg_list = self.__build_qsub_args(workload_generator)
+        arg_list = self._build_qsub_args(workload_generator)
         arg_list.append(job_script_path)
         self.logger.debug('arg_liste: %s' % arg_list)
 
@@ -174,11 +176,12 @@ class HLRS(object):
 
             # searching job id
             for line in ssh_output:
-                self.logger.debug('looking at job id in \n%s' % line)
+                self.logger.debug('searching for job id in \n%s' % line)
 
                 if "hlrs.de" in line:
                     self.logger.debug('possible job id found: %s' % line)
-                    return line
+                    self.job_id = str(line)
+                    return
 
             self.logger.error(
                 'no job id found in \n%s\nexiting!!!' % ssh_output)

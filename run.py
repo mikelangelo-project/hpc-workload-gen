@@ -58,18 +58,17 @@ def run_test(conn, workload_generator, logger):
     logger.info('Running Test')
 
     # Submitting
-    job_id = conn.submit_job(workload_generator)
+    conn.submit_job(workload_generator)
 
     logger.info('Submit successful start waiting for job to end.')
 
     # waiting for job until done
-    conn.wait_for_job(job_id)
+    conn.wait_for_job()
 
     logger.info('Job finished.')
-    return job_id
 
 
-def stage_out(job_id, conn, workload_generator, logger):
+def stage_out(workload_generator, datadir, logger):
     """Clean up to a defined state."""
     logger.info('Starting stage out')
 
@@ -103,10 +102,10 @@ def main(workload, datadir):
     stage_in(conn, workload_generator, datadir, logger)
 
     # runing workload
-    job_id = run_test(conn, workload_generator, logger)
+    run_test(conn, workload_generator, logger)
 
     # collecting output and cleaning up
-    stage_out(job_id, conn, workload_generator, logger)
+    stage_out(workload_generator, datadir, logger)
 
     logger.info('Test complete. Exiting main()')
 
