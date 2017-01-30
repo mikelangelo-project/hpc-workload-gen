@@ -33,10 +33,10 @@ def get_logger():
     # log setup
     logger = logging.getLogger(__name__)
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.INFO)
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -47,18 +47,18 @@ def get_logger():
     return logger
 
 
-def stage_in(conn, workload_generator, datadir, logger):
+def stage_in(conn, datadir, logger):
     """Move job files to the remote system, prepare everything."""
     logger.info('Starting stage in')
-    conn.move_input(workload_generator, datadir)
+    conn.move_input(datadir)
 
 
-def run_test(conn, workload_generator, logger):
+def run_test(conn, logger):
     """Run the test on the remote system."""
     logger.info('Running Test')
 
     # Submitting
-    conn.submit_job(workload_generator)
+    conn.submit_job()
 
     logger.info('Submit successful start waiting for job to end.')
 
@@ -68,11 +68,14 @@ def run_test(conn, workload_generator, logger):
     logger.info('Job finished.')
 
 
-def stage_out(workload_generator, datadir, logger):
+def stage_out(conn, datadir, logger):
     """Clean up to a defined state."""
     logger.info('Starting stage out')
 
-    logger.warn('skipping for the moment')
+    conn.print_log('STDIN')
+    conn.print_log('STDERR')
+    conn.print_log('QSUB_LOG')
+    # conn.remove_files()
 
 
 @click.command()
@@ -96,16 +99,16 @@ def main(workload, datadir):
     workload_generator = Workload(workload)
 
     # Build connection
-    conn = HLRS()
+    conn = HLRS(workload_generator)
 
     # moving files
-    stage_in(conn, workload_generator, datadir, logger)
+    stage_in(conn, datadir, logger)
 
     # runing workload
-    run_test(conn, workload_generator, logger)
+    run_test(conn, logger)
 
     # collecting output and cleaning up
-    stage_out(workload_generator, datadir, logger)
+    stage_out(conn, datadir, logger)
 
     logger.info('Test complete. Exiting main()')
 
