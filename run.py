@@ -25,7 +25,7 @@
 import logging
 import click
 from api.ci import Workload
-from api.connection import HLRS
+from api.connection import HPCconnection
 
 
 def get_logger():
@@ -99,7 +99,7 @@ def main(workload, datadir):
     workload_generator = Workload(workload)
 
     # Build connection
-    conn = HLRS(workload_generator)
+    conn = HPCconnection(workload_generator, 'vsbase2')
 
     # moving files
     stage_in(conn, datadir, logger)

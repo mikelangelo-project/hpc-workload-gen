@@ -27,14 +27,15 @@ from time import sleep
 from sh import ssh, ErrorReturnCode, rsync
 
 
-class HLRS(object):
-    """HLRS connection."""
+class HPCconnection(object):
+    """Connect to the hpc system."""
 
-    def __init__(self, workload_generator):
+    def __init__(self, workload_generator, host):
         """Initialize connection object."""
         self.logger = self._get_logger()
         self.workload_generator = workload_generator
-        self.host = ssh.bake('-n', 'vsbase2')
+        self.host = host
+        self.ssh_host = ssh.bake('-n', host)
         self.job_id = ''  # init empty first
 
     def _get_logger(self):
@@ -55,63 +56,73 @@ class HLRS(object):
         logger.debug('Logger setup complete. Start Program ... ')
         return logger
 
+    def _get_qstat_job_state(self):
+        try:
+            self.logger.debug('getting qstat infos')
+            ssh_output = self.ssh_host(
+                "/opt/torque/current/server/bin/qstat", self.job_id)
+
+            self.logger.debug('qstat output:\n{}'.format(ssh_output))
+
+            if ssh_output != '':
+                # slice the header and the last line which is empty
+                jobs_displayed = ssh_output.split('\n')[2:-1]
+                for job in jobs_displayed:
+                    # remove whitespace
+                    job_info = ' '.join(job.split())
+                    # split into stuff
+                    (self.job_id,
+                        job_name,
+                        job_user,
+                        job_time,
+                        job_status,
+                        job_queue) = job_info.split(' ')
+                    self.logger.debug(
+                        'job {} has status {}'.format(self.job_id, job_status))
+
+                    return job_status
+            else:
+                return None
+
+        except ErrorReturnCode as e:
+            self.logger.error('\nError in ssh call:\n{}'.format(e))
+            print e.stderr
+            exit(1)
+
+    def _is_qstat_job_running(self):
+        job_status = self._get_qstat_job_state()
+
+        if job_status == 'R' or job_status == 'S':
+            self.logger.debug(
+                '{} is running or scheduled'.format(self.job_id))
+            return True
+        elif job_status == 'E':
+            self.logger.debug(
+                '{} is ended, waiting for complete.'.format(self.job_id))
+            return True
+        elif job_status == 'C':
+            self.logger.debug(
+                '{} is complete. exit loop'.format(self.job_id))
+            return False
+        elif job_status is None:
+            self.logger.debug(
+                'no job {} found, assume finished'.format(self.job_id))
+            return False
+        else:
+            self.logger.error(
+                '{} in an unknown stat {}'.format(self.job_id, job_status))
+            return False
+
     def wait_for_job(self):
         """Wait for the job to finish."""
         job_running = True
 
-        self.logger.info('Start waiting for job %s' % self.job_id)
+        self.logger.info('Start waiting for job {}'.format(self.job_id))
         sleeping_time = 5  # seconds
         while job_running:
             self.logger.info('sleeping for {} seconds'.format(sleeping_time))
             sleep(sleeping_time)
-            try:
-                self.logger.debug('getting qstat infos')
-                ssh_output = self.host(
-                    "/opt/torque/current/server/bin/qstat", self.job_id)
-
-                self.logger.debug('ssh return code: %s' % ssh_output.exit_code)
-                self.logger.debug('type of the return %s' % type(ssh_output))
-                self.logger.debug('qstat output:\n%s' % ssh_output)
-
-                if ssh_output != '':
-                    # slice the header and the last line which is empty
-                    jobs_displayed = ssh_output.split('\n')[2:-1]
-                    for job in jobs_displayed:
-                        # remove whitespace
-                        job_info = ' '.join(job.split())
-                        # split into stuff
-                        (self.job_id,
-                            job_name,
-                            job_user,
-                            job_time,
-                            job_status,
-                            job_queue) = job_info.split(' ')
-                        self.logger.debug(
-                            'job %s has status %s' % (self.job_id, job_status))
-                        if job_status == 'R' or job_status == 'S':
-                            self.logger.debug(
-                                '%s is running or scheduled' % self.job_id)
-                        elif job_status == 'E':
-                            self.logger.debug(
-                                '%s is ended, waiting for complete.'
-                                % self.job_id)
-                        elif job_status == 'C':
-                            self.logger.debug(
-                                '%s is complete. exit loop' % self.job_id)
-                            job_running = False
-                        else:
-                            self.logger.error(
-                                '%s in an unknown stat %s' % (
-                                    self.job_id, job_status))
-                else:
-                    self.logger.debug(
-                        'no job %s found, amuse finished' % self.job_id)
-                    job_running = False
-
-            except ErrorReturnCode as e:
-                self.logger.error('\nError in ssh call:\n%s' % e)
-                print e.stderr
-                exit(1)
+            job_running = self._is_qstat_job_running()
 
         self.logger.info('Job finished. Unblocking now.')
 
@@ -124,16 +135,16 @@ class HLRS(object):
                 'qsub_number_of_processes_per_node'):
             nodes = self.workload_generator.get_params('qsub_number_of_nodes')
             arg_list.append('-l')  # indicate additional parameter
-            arg_list.append('nodes=%s' % nodes)
-            self.logger.debug('arg_list: %s' % arg_list)
+            arg_list.append('nodes={}'.format(nodes))
+            self.logger.debug('arg_list: {}'.format(arg_list))
 
         else:
             nodes = self.workload_generator.get_params('qsub_number_of_nodes')
             ppn = self.workload_generator.get_params(
                 'qsub_number_of_processes_per_node')
             arg_list.append('-l')  # indicate additional parameter
-            arg_list.append('nodes=%s:ppn=%s' % (nodes, ppn))
-            self.logger.debug('arg_list: %s' % arg_list)
+            arg_list.append('nodes={}:ppn={}'.format(nodes, ppn))
+            self.logger.debug('arg_list: {}'.format(arg_list))
 
         if self.workload_generator.get_vtorque():
             vtorque = self.workload_generator.get_vtorque()
@@ -141,16 +152,13 @@ class HLRS(object):
             # get the keys (all are optional, swappable)
             arg_list_vtorque = []
             for key in vtorque:
-                arg_list_vtorque.append('%s=%s' % (key, vtorque[key]))
+                arg_list_vtorque.append('{}={}'.format(key, vtorque[key]))
             arg_list.append(','.join(arg_list_vtorque))
-            self.logger.debug('arg_list= %s' % arg_list)
-
+            self.logger.debug('arg_list= {}'.format(arg_list))
+        self.logger.debug('returning arg list = {}'.format(arg_list))
         return arg_list
 
-    def submit_job(self):
-        """Submit the job to qsub, returns job_id."""
-        self.logger.info('Submitting job ...')
-
+    def _get_job_script_path(self):
         job_script_path = '~/'
         job_script_path += str(
             self.workload_generator.get_params('experiment_dir')
@@ -161,71 +169,78 @@ class HLRS(object):
         job_script_path += self.workload_generator.get_params(
             'job_script_name'
         )
+        return job_script_path
+
+    def submit_job(self):
+        """Submit the job to qsub, returns job_id."""
+        self.logger.info('Submitting job ...')
+
+        job_script_path = self._get_job_script_path()
 
         arg_list = self._build_qsub_args()
         arg_list.append(job_script_path)
-        self.logger.debug('arg_liste: %s' % arg_list)
+        self.logger.debug('arg_liste: {}'.format(arg_list))
 
         try:
             self.logger.debug(
-                '/opt/dev/vTorque/src/qsub %s' % arg_list)
+                '/opt/dev/vTorque/src/qsub {}'.format(arg_list)
+            )
 
             # Job submit
-            ssh_output = self.host(
-                '/opt/dev/vTorque/src/qsub',
-                *arg_list)
-
-            self.logger.debug('ssh return code: %s' % ssh_output.exit_code)
-            self.logger.debug('type of the return %s' % type(ssh_output))
-            self.logger.debug('ssh_output output:\n%s' % ssh_output)
+            ssh_output = self.ssh_host('/opt/dev/vTorque/src/qsub', *arg_list)
 
             # searching job id
             for line in ssh_output:
-                self.logger.debug('searching for job id in \n%s' % line)
+                self.logger.debug('searching for job id in \n{}'.format(line))
 
                 if "hlrs.de" in line:
-                    self.logger.debug('possible job id found: %s' % line)
+                    self.logger.debug('possible job id found: {}'.format(line))
                     self.job_id = str(line)
                     return
 
             self.logger.error(
-                'no job id found in \n%s\nexiting!!!' % ssh_output)
+                'no job id found in \n{}\nexiting!!!'.format(ssh_output)
+            )
             exit(1)
 
         except ErrorReturnCode as e:
-            self.logger.error('\nError in ssh call:\n%s' % e)
+            self.logger.error('\nError in ssh call:\n{}'.format(e))
             print e.stderr
             exit(1)
 
     def move_input(self, datadir):
         """Move the input files to the remote system."""
-        job_script_dir_path = datadir + '/'
-        job_script_dir_path += self.workload_generator.get_params(
+        experiment_dir = self.workload_generator.get_params(
             'experiment_dir'
         )
+        job_script_dir_path = datadir + '/'
+        job_script_dir_path += experiment_dir
 
         # remove last / from input path
         if not job_script_dir_path.endswith('/'):
-            self.logger.info('adding / in %s' % job_script_dir_path)
+            self.logger.info('adding / in {}'.format(job_script_dir_path))
             job_script_dir_path = job_script_dir_path + '/'
-            self.logger.info('new path is %s' % job_script_dir_path)
+            self.logger.info('new path is {}'.format(job_script_dir_path))
 
-        remote_path = 'vsbase2:~/'
-        remote_path += self.workload_generator.get_params('experiment_dir')
+        remote_path = '{}:~/'.format(self.host)
+        remote_path += experiment_dir
         # move job script
         self.logger.info(
-            'moving date from %s to %s' % (job_script_dir_path, remote_path))
+            'moving date from {} to {}'.format(
+                job_script_dir_path, remote_path
+            )
+        )
         # create remote dir first
-        self.host(
+        self.ssh_host(
             "mkdir",
             "-p",
-            self.workload_generator.get_params('experiment_dir')
+            experiment_dir
         )
 
         rsync_output = rsync(
             "-azv", "--delete", job_script_dir_path, remote_path)
 
-        self.logger.debug('rsync output:\n%s' % rsync_output)
+        self.logger.debug('rsync output:\n{}'.format(rsync_output))
 
         # testing rsync output
         if rsync_output == '':
@@ -238,7 +253,7 @@ class HLRS(object):
 
     def _get_output_log(self, log_path):
         """Collect the output log form the remote system."""
-        remote_log = self.host('cat', log_path)
+        remote_log = self.ssh_host('cat', log_path)
         return remote_log
 
     def _get_std_log_path(self, log_type):
