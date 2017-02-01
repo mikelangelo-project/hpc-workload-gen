@@ -29,3 +29,4 @@ workload:
     experiment_dir: experiment01
     qsub_number_of_nodes: 1
     qsub_number_of_processes_per_node: 16
+    application_log: ~/experiment_log/log

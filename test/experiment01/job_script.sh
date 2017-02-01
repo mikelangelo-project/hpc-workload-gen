@@ -18,5 +18,6 @@
 # @Author: Uwe Schilling, schilling@hlrs.de
 # @COMPANY: HLRS, University of Stuttgart
 # @Date: 2016-11-22
-echo test > ${HOME}/$(hostname)
+mkdir ${HOME}/experiment_log
+echo $(hostname) >> ${HOME}/experiment_log/log
 echo 'std out test'
