@@ -108,6 +108,7 @@ class Workload(object):
                 experiment_dir: <path> [mandatory] -> contains job_script
                 qsub_number_of_nodes: <count> [optional]
                 qsub_number_of_processes_per_node: <count> [optional]
+                application_log: <file> [mandatory] -> single log-file
             vTorque:
                 IMG: <path to image e.g. /image/image.img>
                 DISTRO: <debian|rethat|osv>
@@ -131,6 +132,7 @@ class Workload(object):
             self.workload_dict['name']
             self.workload_dict['params']['job_script_name']
             self.workload_dict['params']['experiment_dir']
+            self.workload_dict['params']['application_log']
 
         except KeyError:
             self.logger.error(

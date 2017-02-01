@@ -290,7 +290,7 @@ class HPCconnection(object):
             '----------------------------------------------\n'.format(log_type)
         )
         for line in log_file:
-            print unicode(line)
+            print unicode(line).rstrip()
 
         self.logger.info(
             '\n'
@@ -303,6 +303,8 @@ class HPCconnection(object):
 
         elif log_type == 'QSUB_LOG':
             log_path = self._get_qsub_log_path()
+        elif log_type == 'APP_LOG':
+            log_path = self.workload_generator.get_params('application_log')
         else:
             self.logger.error('Unknown log type, {}'.format(log_type))
             exit(1)

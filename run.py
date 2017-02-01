@@ -75,6 +75,7 @@ def stage_out(conn, datadir, logger):
     conn.print_log('STDIN')
     conn.print_log('STDERR')
     conn.print_log('QSUB_LOG')
+    conn.print_log('APP_LOG')
     # conn.remove_files()
 
 
