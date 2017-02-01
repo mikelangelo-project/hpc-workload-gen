@@ -71,24 +71,29 @@ class Workload(object):
     def __pars_yuml(self):
         """Parsing yuml provided by the CI."""
         self.logger.info('parsing yuml provided by the CI')
-        self.logger.debug('using %s as path to yuml' % self.workload_YAML_file)
+        self.logger.debug(
+            'using {} as path to yuml'.format(self.workload_YAML_file)
+        )
 
         with open(self.workload_YAML_file, 'r') as stream:
 
             try:
                 yuml_dict = yaml.load(stream)
-                self.logger.debug('got directory form YAML: %s' % yuml_dict)
+                self.logger.debug(
+                    'got directory form YAML: {}'.format(yuml_dict)
+                )
                 # encode the structure of the real workload
                 workload_dict = yuml_dict["workload"]
                 return workload_dict
 
             except yaml.YAMLError as exc:
                 self.logger.error(
-                    'Could not read YAML file %s\n'
+                    'Could not read YAML file {}\n'
                     'content of the file:\n'
-                    '%s\n'
+                    '{}\n'
                     'error is\n'
-                    '%s' % (self.workload_YAML_file, stream, exc))
+                    '{}'.format(self.workload_YAML_file, stream, exc)
+                )
                 self.logger.error('Without YAML no configuration, exiting')
                 exit(1)
 
@@ -130,12 +135,14 @@ class Workload(object):
         except KeyError:
             self.logger.error(
                 'Mandatory things missing in workload_generator:\n'
-                'workload[name]: %s\n'
-                'workload[params][job_script_name]: %s\n'
-                'workload[params][experiment_dir]: %s\n' % (
+                'workload[name]: {}\n'
+                'workload[params][job_script_name]: {}\n'
+                'workload[params][experiment_dir]: {}\n'.format(
                     self.workload_dict['name'],
                     self.workload_dict['params']['job_script_name'],
-                    self.workload_dict['params']['experiment_dir']))
+                    self.workload_dict['params']['experiment_dir']
+                )
+            )
             self.logger.error('workload_generator error, exiting')
             exit(1)
 
@@ -146,17 +153,21 @@ class Workload(object):
                     ['qsub_number_of_nodes'], int):
                 self.logger.error(
                     'workload[params][qsub_number_of_nodes]'
-                    'is not an integer: %s'
-                    % self.workload_dict['params']['qsub_number_of_nodes'])
+                    'is not an integer: {}'.format(
+                        self.workload_dict['params']['qsub_number_of_nodes']
+                    )
+                )
 
             if not isinstance(
                     self.workload_dict['params']
                     ['qsub_number_of_processes_per_node'], int):
                 self.logger.error(
                     'workload[params][qsub_number_of_processes_per_node]'
-                    'is not an integer: %s' %
-                    self.workload_generator['params']
-                    ['qsub_number_of_processes_per_node'])
+                    'is not an integer: {}'.format(
+                        self.workload_generator['params']
+                        ['qsub_number_of_processes_per_node']
+                    )
+                )
 
         except KeyError:
             self.logger.warning('no qsub additions')
@@ -174,24 +185,27 @@ class Workload(object):
 
     def get_name(self):
         """Getter for name."""
-        self.logger.debug('returning name %s' % self.name)
+        self.logger.debug('returning name {}'.format(self.name))
         return self.name
 
     def get_params(self, param):
         """Getter for parameters."""
         try:
             self.logger.debug(
-                'returning parameters %s' % self.params[str(param)])
+                'returning parameters {}'.format(self.params[str(param)])
+            )
             return self.params[str(param)]
         except KeyError:
-            self.logger.info('no parameter %s' % param)
+            self.logger.info('no parameter {}'.format(param))
             self.logger.debug('returning None')
             return None
 
     def get_vtorque(self):
         """Getter for vTorque stuff."""
         try:
-            self.logger.debug('returning vTorque stuff %s' % self.vtorque)
+            self.logger.debug(
+                'returning vTorque stuff {}'.format(self.vtorque)
+            )
             return self.vtorque
         except KeyError:
             self.logger.info('no parameter for vTorque stuff')
@@ -201,5 +215,5 @@ class Workload(object):
     def get_data_dir(self):
         """Getter for base directory."""
         return_str = self.datadir + self.get_params('experiment_dir')
-        self.logger.debug('returning data directory: %s' % return_str)
+        self.logger.debug('returning data directory: {}'.format(return_str))
         return return_str
