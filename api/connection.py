@@ -100,6 +100,10 @@ class HPCconnection(object):
             self.logger.debug(
                 '{} is ended, waiting for complete.'.format(self.job_id))
             return True
+        elif job_status == 'Q':
+            self.logger.debug(
+                '{} is queued. waiting for start'.format(self.job_id))
+            return True
         elif job_status == 'C':
             self.logger.debug(
                 '{} is complete. exit loop'.format(self.job_id))
