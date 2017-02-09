@@ -23,6 +23,7 @@
 
 
 import logging
+import time
 from time import sleep
 from sh import ssh, ErrorReturnCode, rsync
 
@@ -37,6 +38,7 @@ class HPCconnection(object):
         self.host = host
         self.ssh_host = ssh.bake('-n', host)
         self.job_id = ''  # init empty first
+        self.time_stamp_jobstart = 0  # only inti
 
     def _get_logger(self):
         """Setup the global logger."""
@@ -190,6 +192,11 @@ class HPCconnection(object):
                 '/opt/dev/vTorque/src/qsub {}'.format(arg_list)
             )
 
+            # get stating time and convert
+            self.time_stamp_jobstart = int(time.time()) * 1000
+            self.logger.debug(
+                'stat time stamp: {}'.format(self.time_stamp_jobstart)
+            )
             # Job submit
             ssh_output = self.ssh_host('/opt/dev/vTorque/src/qsub', *arg_list)
 
@@ -200,6 +207,17 @@ class HPCconnection(object):
                 if "hlrs.de" in line:
                     self.logger.debug('possible job id found: {}'.format(line))
                     self.job_id = str(line)
+                    self.logger.info(
+                        'Job performance data at:\n'
+                        'https://vsbase2.hlrs.de/dashboard/db/playground?'
+                        'panelId=1&'
+                        'fullscreen&'
+                        'var-JobId=snapTask-hpcuschi-{}&'
+                        'from={}&'
+                        'to=now'.format(
+                            self.job_id.rstrip(), self.time_stamp_jobstart
+                        )
+                    )
                     return
 
             self.logger.error(
