@@ -31,12 +31,13 @@ from sh import ssh, ErrorReturnCode, rsync
 class HPCconnection(object):
     """Connect to the hpc system."""
 
-    def __init__(self, workload_generator, host):
+    def __init__(self, workload_generator, cfg):
         """Initialize connection object."""
         self.logger = self._get_logger()
+        self.cfg = cfg
         self.workload_generator = workload_generator
-        self.host = host
-        self.ssh_host = ssh.bake('-n', host)
+        self.host = cfg.host
+        self.ssh_host = ssh.bake('-n', self.host)
         self.job_id = ''  # init empty first
         self.time_stamp_jobstart = 0  # only inti
 
@@ -61,8 +62,7 @@ class HPCconnection(object):
     def _get_qstat_job_state(self):
         try:
             self.logger.debug('getting qstat infos')
-            ssh_output = self.ssh_host(
-                "/opt/torque/current/server/bin/qstat", self.job_id)
+            ssh_output = self.ssh_host(self.cfg.path_qstat, self.job_id)
 
             self.logger.debug('qstat output:\n{}'.format(ssh_output))
 
@@ -189,7 +189,7 @@ class HPCconnection(object):
 
         try:
             self.logger.debug(
-                '/opt/dev/vTorque/src/qsub {}'.format(arg_list)
+                '{} {}'.format(self.cfg.path_qsub, arg_list)
             )
 
             # get stating time and convert
@@ -198,7 +198,7 @@ class HPCconnection(object):
                 'stat time stamp: {}'.format(self.time_stamp_jobstart)
             )
             # Job submit
-            ssh_output = self.ssh_host('/opt/dev/vTorque/src/qsub', *arg_list)
+            ssh_output = self.ssh_host(self.cfg.path_qsub, *arg_list)
 
             # searching job id
             for line in ssh_output:
@@ -207,17 +207,18 @@ class HPCconnection(object):
                 if "hlrs.de" in line:
                     self.logger.debug('possible job id found: {}'.format(line))
                     self.job_id = str(line)
-                    self.logger.info(
-                        'Job performance data at:\n'
-                        'https://vsbase2.hlrs.de/dashboard/db/playground?'
-                        'panelId=1&'
-                        'fullscreen&'
-                        'var-JobId=snapTask-hpcuschi-{}&'
-                        'from={}&'
-                        'to=now'.format(
-                            self.job_id.rstrip(), self.time_stamp_jobstart
+                    if self.cfg.grafana:
+                        self.logger.info(
+                            'Job performance data at:\n'
+                            '{}var-JobId=snapTask-{}-{}&'
+                            'from={}&'
+                            'to=now'.format(
+                                self.cfg.grafana_base_string,
+                                self.cfg.user_name,
+                                self.job_id.rstrip(),
+                                self.time_stamp_jobstart
+                            )
                         )
-                    )
                     return
 
             self.logger.error(
@@ -301,7 +302,10 @@ class HPCconnection(object):
         self.logger.debug('getting vtorque as {}'.format(vtorque))
         if self.workload_generator.get_vtorque() is not None:
             base_path = '~/.vtorque'  # TODO replace by config file
-            return '{}/{}.hlrs.de/debug.log'.format(base_path, self.job_id)
+            return '{}/{}.{}/debug.log'.format(
+                base_path,
+                self.cfg.domain,
+                self.job_id)
 
     def _print_log_file(self, log_type, log_file):
         """Collect and print the stdin log from qsub."""

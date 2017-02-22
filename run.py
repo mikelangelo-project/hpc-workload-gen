@@ -26,6 +26,7 @@ import logging
 import click
 from api.ci import Workload
 from api.connection import HPCconnection
+from settings import Configuration
 
 
 def get_logger():
@@ -92,15 +93,25 @@ def stage_out(conn, datadir, logger):
     type=click.Path(exists=True),
     help='base path containing the experiment',
     required=True)
-def main(workload, datadir):
-    """The main program."""
+@click.option(
+    '-c',
+    '--configfile',
+    default='workload.cfg',
+    type=click.Path(),
+    help='Configuration file, if not provided the default is used. '
+         '[./workload.cfg]')
+def main(workload, datadir, configfile):
+    """Run workloads on specified systems."""
     logger = get_logger()
+
+    # Build config object
+    cfg = Configuration(configfile)
 
     # Pars yuml
     workload_generator = Workload(workload)
 
     # Build connection
-    conn = HPCconnection(workload_generator, 'vsbase2')
+    conn = HPCconnection(workload_generator, cfg)
 
     # moving files
     stage_in(conn, datadir, logger)
