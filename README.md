@@ -5,16 +5,16 @@ The aim of this project is to give CI tools an API that can be used to interact 
 
 ## Table of contents
 
-* [Getting Started](#Getting-Started)
-* [Prerequisites](#Prerequisites)
-* [Installing](#Installing)
-* [Example](#Example)
-* [License](#License)
-* [Acknowledgements](#Acknowledgements)
+* [Getting Started](#getting-started)
+* [Prerequisites](#prerequisites)
+* [Installing](#installing)
+* [Example](#example)
+* [License](#license)
+* [Acknowledgements](#acknowledgements)
 * Additional Documentation
-    * [Configuration File](#README.md)
-    * [Workload.yaml](#README.md)
-    * [CLI](#README.md)
+    * [Configuration File](doc/config-file.md)
+    * [Workload.yaml](doc/workload.yaml.md)
+    * [CLI](doc/cli.md)
 
 
 ## Getting Started
@@ -69,7 +69,7 @@ Alternately you can use a virtual environment to install the requirements.
 
 ### Example
 
-This example executes the simplest workload possible. It will `echo` the host name of the compute node behind torque to a log file. See the [job_script.sh](test/ecperiment01/job_script.sh)
+This example executes the simplest workload possible. It will `echo` the host name of the compute node behind torque to a log file. See the [job_script.sh](test/experiment01/job_script.sh)
 
 To test your run, execute:
 

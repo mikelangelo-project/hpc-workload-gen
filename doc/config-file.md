@@ -20,8 +20,8 @@ This generates the default configuration inside the project root.
     "user_name": "user"
 }
 ```
-|   Key                     |   Value       |   Default     |   Description                                                                         |
-|-                          |:-:            |:-:            |:-:                                                                                    |
+| Key                       | Value         | Default       | Description                                                                           |
+| ---                       | :---:         | :---:         | :---:                                                                                 |
 | domain                    | string        | -             | pbs uses this value and appends it for example the the job name                       |
 | grafana                   | True / False  | True          | If you use vTorque with snap and a grafana/influxdb settup you can enable it here.    |
 | grafana_dashbord_name     | string        | playground    | Grafana setting, this will be usesed to build the grafana link.                       |
