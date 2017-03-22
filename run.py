@@ -24,6 +24,7 @@
 
 import logging
 import click
+import json
 from api.ci import Workload
 from api.connection import HPCconnection
 from settings import Configuration
@@ -32,7 +33,7 @@ from settings import Configuration
 def get_logger():
     """Setup the global logger."""
     # log setup
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("hpc-stuttgart")
 
     logger.setLevel(logging.INFO)
     # create console handler with a higher log level
@@ -51,6 +52,12 @@ def get_logger():
 def stage_in(conn, datadir, logger):
     """Move job files to the remote system, prepare everything."""
     logger.info('Starting stage in')
+    # print additional information about the job
+    job_infos = json.dumps(
+        conn.workload_generator.get_info(),
+        sort_keys=True)
+    logger.info('Job informations:\n{}'.format(job_infos))
+    # start stage_in
     conn.move_input(datadir)
 
 
@@ -61,7 +68,7 @@ def run_test(conn, logger):
     # Submitting
     conn.submit_job()
 
-    logger.info('Submit successful start waiting for job to end.')
+    logger.debug('Submit successful start waiting for job to end.')
 
     # waiting for job until done
     conn.wait_for_job()
@@ -76,7 +83,6 @@ def stage_out(conn, datadir, logger):
     conn.print_log('STDIN')
     conn.print_log('STDERR')
     conn.print_log('QSUB_LOG')
-    conn.print_log('APP_LOG')
     # conn.remove_files()
 
 

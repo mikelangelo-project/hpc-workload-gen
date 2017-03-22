@@ -37,7 +37,7 @@ class Workload(object):
         self.workload_YAML_file = yuml_file
         self.workload_dict = self.__pars_yuml()
 
-        self.logger.info('testing workload_generator')
+        self.logger.debug('testing workload_generator')
         self.__test_workload_generator()
 
         self.name = self.workload_dict['name']
@@ -219,3 +219,8 @@ class Workload(object):
         return_str = self.datadir + self.get_params('experiment_dir')
         self.logger.debug('returning data directory: {}'.format(return_str))
         return return_str
+
+    def get_info(self):
+        """Return the workload_dict for printing informations."""
+        return_dict = self.workload_dict
+        return return_dict

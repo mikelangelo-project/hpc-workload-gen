@@ -19,25 +19,24 @@ workload:
         experiment_dir: <path> [mandatory] -> contains job_script
         qsub_number_of_nodes: <count> [optional]
         qsub_number_of_processes_per_node: <count> [optional]
-        application_log: <file> [mandatory] -> single log-file
     vTorque:
         IMG: <path to image e.g. /image/image.img>
         DISTRO: <debian|rethat|osv>
         RAM: <count>
         VCPUS: <count>
         VMS_PER_NODE: <count>
-        METADATA <path>
-        DISK <path>
-        ARCH <x86_64>
-        HYPERVISOR <kvm|skvm>
-        VCPU_PINNING <true|false>
-        VM_PROLOGUE <path>
-        VM_EPILOGUE <path>
-        VRDMA <true|false>
-        IOCM <true|false>
-        IOCM_MIN <count>
-        IOCM_MAX <count>
-        FS_TYPE <>
+        METADATA: <path>
+        DISK: <path>
+        ARCH: <x86_64>
+        HYPERVISOR: <kvm|skvm>
+        VCPU_PINNING: <true|false>
+        VM_PROLOGUE: <path>
+        VM_EPILOGUE: <path>
+        VRDMA: <true|false>
+        IOCM: <true|false>
+        IOCM_MIN: <count>
+        IOCM_MAX: <count>
+        FS_TYPE: <>
 ```
 
 ## Example
@@ -54,7 +53,6 @@ The user create an experiment in the experiment repo like experiment/hpc. Inside
       experiment_dir: experiment01
       qsub_number_of_nodes: 1
       qsub_number_of_processes_per_node: 16
-      application_log: ~/experiment_log/log
 ```
 
 * With this your job will be executed on 1 node with 16 processes. This will be handled by PBS torque / vTorque.

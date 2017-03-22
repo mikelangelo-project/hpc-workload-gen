@@ -123,10 +123,11 @@ class HPCconnection(object):
         """Wait for the job to finish."""
         job_running = True
 
-        self.logger.info('Start waiting for job {}'.format(self.job_id))
+        self.logger.info('Start waiting for job {} to end.\nThis can take '
+                         'up to 1 hour, please be patient'.format(self.job_id))
         sleeping_time = 5  # seconds
         while job_running:
-            self.logger.info('sleeping for {} seconds'.format(sleeping_time))
+            self.logger.debug('sleeping for {} seconds'.format(sleeping_time))
             sleep(sleeping_time)
             job_running = self._is_qstat_job_running()
 
@@ -135,7 +136,7 @@ class HPCconnection(object):
     def _build_qsub_args(self):
         """Build a list of arguments passed to qsub."""
         arg_list = []
-        self.logger.info('arg_list building arg_list')
+        self.logger.debug('arg_list building arg_list')
 
         if not self.workload_generator.get_params(
                 'qsub_number_of_processes_per_node'):
@@ -185,7 +186,7 @@ class HPCconnection(object):
 
         arg_list = self._build_qsub_args()
         arg_list.append(job_script_path)
-        self.logger.debug('arg_liste: {}'.format(arg_list))
+        self.logger.info('arg_liste: {}'.format(arg_list))
 
         try:
             self.logger.debug(
@@ -241,9 +242,9 @@ class HPCconnection(object):
 
         # remove last / from input path
         if not job_script_dir_path.endswith('/'):
-            self.logger.info('adding / in {}'.format(job_script_dir_path))
+            self.logger.debug('adding / in {}'.format(job_script_dir_path))
             job_script_dir_path = job_script_dir_path + '/'
-            self.logger.info('new path is {}'.format(job_script_dir_path))
+            self.logger.debug('new path is {}'.format(job_script_dir_path))
 
         remote_path = '{}:~/'.format(self.host)
         remote_path += experiment_dir
@@ -315,8 +316,7 @@ class HPCconnection(object):
             'Contend of log: {}\n'
             '----------------------------------------------\n'.format(log_type)
         )
-        for line in log_file:
-            print unicode(line).rstrip()
+        print(log_file)
 
         self.logger.info(
             '\n'
@@ -329,8 +329,6 @@ class HPCconnection(object):
 
         elif log_type == 'QSUB_LOG':
             log_path = self._get_qsub_log_path()
-        elif log_type == 'APP_LOG':
-            log_path = self.workload_generator.get_params('application_log')
         else:
             self.logger.error('Unknown log type, {}'.format(log_type))
             exit(1)
