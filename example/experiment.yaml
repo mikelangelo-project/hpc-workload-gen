@@ -1,0 +1,57 @@
+#
+# Copyright 2016 HLRS, University of Stuttgart
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+description: Cancellous Bones Use Case
+
+
+#
+# for scotty, describes experiment
+#
+tags:
+  - hpc
+  - mpi
+
+
+#resources:
+#  - name: my_resource_def
+#    generator: git:git@gitlab.gwdg.de:Bones_UC-CI_Experiment.git
+#    params:
+#      user: myuser
+#      passwd: <%= ENV['mysecret'] %>
+
+
+workloads:
+    #
+    # experiment configuration #1
+    #
+  - name: test_workload_1
+    generator: file:.
+    params:
+      hpc_config: example/hpc_backend.cfg
+      job_script: example/experiment01/job_script.sh
+      qsub_args: "-l nodes=1"
+      vsub_args: "-vm vcpus=4 -vm ram=8012M"
+    #
+    # experiment configuration #2
+    #
+  - name: test_workload_2
+    generator: file:.
+    params:
+      job_script: example/experiment02/job_script.sh
+      input_data: example/experiment02/input_data
+      qsub_args: "-l nodes=2:batch"
+      vsub_args: "-vm vcpus=8 -vm ram=8012M"

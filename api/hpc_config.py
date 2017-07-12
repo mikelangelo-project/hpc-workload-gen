@@ -22,14 +22,17 @@
 # @Date: 2017-02-21
 
 from __future__ import with_statement
+import sys
 import json
-import logging
+import os
+from api.logger import getLogger
 
 
-class Configuration(object):
+class HPCBackendConfiguration(object):
     """Connect to the hpc system."""
 
-    def __init__(self, path='workload.cfg'):
+
+    def __init__(self, hpcConfigPath):
         """
         Default values for the generator.
 
@@ -37,40 +40,52 @@ class Configuration(object):
         self.host = 'vsbase2'
 
         The path to the qsub tool on the remote host:
-        self.path_qsub = '/opt/dev/vTorque/src/qsub'
+        self.path_qsub = '/usr/bin/qstat'
 
+        The path to the vsub tool on the remote host:
+        self.path_vsub = '/opt/vtorque/vsub'
+        
         The path to the qstat tool on the remote host:
-        self.path_qstat = '/opt/torque/current/server/bin/qstat'
+        self.path_qstat = '/usr/bin/qstat'
 
         The name of the remote user. This is used to generate the
         grafana link if grafana is used:
         self.user_name = 'jenkins'
         """
-        self.logger = self._get_logger()
-        self.config_dict = self._get_config_dict(path)
+        self.logger = getLogger(__name__)
+
+        # ensure file exists
+        if hpcConfigPath is None or not os.path.isfile(hpcConfigPath):
+            self.logger.error(
+                'HPC back-end configuration \'{}\' is missing.'.format(hpcConfigPath)
+            )
+            sys.exit(1)
+
+        self.config_dict = self._get_config_dict(hpcConfigPath)
         self.logger.debug('{}'.format(self.config_dict))
         try:
             self.host = self.config_dict['host']
             self.domain = self.config_dict['domain']
             self.user_name = self.config_dict['user_name']
+            self.execution_dir = self.config_dict['execution_dir']
 
             self.poll_time_qstat = self.config_dict['poll_time_qstat']
 
             self.path_qsub = self.config_dict['path_qsub']
+            self.path_vsub = self.config_dict['path_vsub']
             self.path_qstat = self.config_dict['path_qstat']
+            self.path_vtorque_log = self.config_dict['path_vtorque_log']
 
             self.grafana = self.config_dict['grafana']
             self.grafana_host = self.config_dict['grafana_host']
-            self.grafana_dashbord_name = self.config_dict[
-                'grafana_dashbord_name']
+            self.grafana_dashbord_name = self.config_dict['grafana_dashbord_name']
 
-        except (KeyError):
+        except (KeyError) as e:
             self.logger.warning(
-                '\nCofnig file is missing keys. Backup your file, delete the'
-                ' origin file and rerun. A new config file will be written.'
-                ' Please modify this on.'
+                '\nConfig file \'{}\'is missing key \'{}\'. Backup your file, delete the'
+                ' origin file and rerun. A new configuration file will be created.'.format(path, e.args[0])
             )
-            exit(1)
+            sys.exit(1)
 
         # non changeable parameters
         self.grafana_base_string = str(
@@ -79,22 +94,6 @@ class Configuration(object):
             'fullscreen&'.format(self.grafana_host, self.grafana_dashbord_name)
         )
 
-    def _get_logger(self):
-        """Setup the global logger."""
-        logger = logging.getLogger(__name__)
-
-        logger.setLevel(logging.INFO)
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        ch.setFormatter(formatter)
-        # add the handlers to the logger
-        logger.addHandler(ch)
-        logger.debug('Logger setup complete. Start Program ... ')
-        return logger
 
     def _get_config_dict(self, path):
         try:
@@ -102,31 +101,44 @@ class Configuration(object):
                 config_dict = json.load(data_file)
         except (IOError):
             # file not found
-            self.logger.info('No Config file found! Write a new one.')
+            self.logger.info('No HPC backend configuration found!')
             config_dict = self._get_default_dict()
             with open(path, 'w') as data_file:
                 json.dump(
                     config_dict, data_file, sort_keys=True, indent=4)
+            self.logger.info('New HPC backend configuration file \'{}\' created.\nPlease edit it and re-run.'.format(path))
+            sys.exit(1);
         except (ValueError) as e:
             # display json errors
             self.logger.error(
                 'something is wrong with the json file.\n{}'.format(e))
-            exit(1)
+            sys.exit(1)
         self.logger.debug(
             json.dumps(config_dict, sort_keys=True, indent=4)
         )
         return config_dict
 
+
     def _get_default_dict(self):
         return_dict = {
-            'host': 'localhost',
-            'domain': '-',
-            'user_name': 'user',
+            'host': 'submission-frontend',
+            'domain': 'mydomain',
+            'user_name': 'ci',
             'poll_time_qstat': 5,
-            'path_qsub': '/bin/qsub',
-            'path_qstat': '/bin/qstat',
+            'execution_dir': './',
+            'path_qsub': '/usr/bin/qsub',
+            'path_qstat': '/usr/bin/qstat',
+            'path_vsub': '/opt/vtorque/vsub',
             'grafana': True,
             'grafana_host': 'localhost',
             'grafana_dashbord_name': 'playground'
         }
         return return_dict
+
+
+    def get_value(self, key):
+        #TODO use consts for keys
+        return self.config_dict[key]
+
+
+

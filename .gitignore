@@ -1,0 +1,10 @@
+.project
+.pydevproject
+*.pyc
+api/*.pyc
+doc/*.md.html
+.scotty
+.scotty/
+.scotty/components
+hpc-example/experiment_dev.yaml
+example/experiment_dev.yaml

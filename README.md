@@ -10,10 +10,10 @@ The aim of this project is to give CI tools an API that can be used to interact 
 * [Installing](#installing)
 * [Example](#example)
 * [License](#license)
-* [Acknowledgements](#acknowledgements)
+* [Acknowledgement](#acknowledgement)
 * Additional Documentation
-    * [Configuration File](doc/config-file.md)
-    * [Workload.yaml](doc/workload.yaml.md)
+    * [HPC Back-end Configuration](doc/config-file.md)
+    * [Experiment Configuration](doc/experiment.yaml.md)
     * [CLI](doc/cli.md)
 
 
@@ -74,18 +74,15 @@ This example executes the simplest workload possible. It will `echo` the host na
 To test your run, execute:
 
 ```
-./run.py --workload test/workload.yml --datadir .
+./run.py --experiment test/workload.yml --data .
 ```
 
-If it not work the first time, then you should check the `workload.cfg`, make sure the setting matches your setup and your configuration. For more infos see [Configuration File](doc/config-file.md).
+If it not work the first time, then you should check the `hpc_backend.cfg`, make sure the setting matches your setup and your configuration. For more infos see [Configuration File](doc/config-file.md).
 
 ## License
 
 hpc-workload-gen is distributed under the Apache License 2.0 license.
 
-## Acknowledgements
+## Acknowledgement
 
-This project  has been conducted within the RIA [MIKELANGELO
-project](https://www.mikelangelo-project.eu) (no.  645402), started in January
-2015, and co-funded by the European Commission under the H2020-ICT- 07-2014:
-Advanced Cloud Infrastructures and Services programme.
+This project  has been conducted within the RIA [MIKELANGELO project](https://www.mikelangelo-project.eu) (no.  645402), started in January 2015, and co-funded by the European Commission under the H2020-ICT- 07-2014: Advanced Cloud Infrastructures and Services programme.
