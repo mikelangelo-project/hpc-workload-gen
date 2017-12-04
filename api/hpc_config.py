@@ -44,7 +44,7 @@ class HPCBackendConfiguration(object):
 
         The path to the vsub tool on the remote host:
         self.path_vsub = '/opt/vtorque/vsub'
-        
+
         The path to the qstat tool on the remote host:
         self.path_qstat = '/usr/bin/qstat'
 
@@ -61,6 +61,25 @@ class HPCBackendConfiguration(object):
             )
             sys.exit(1)
 
+        #
+        # replace placeholders with settings from env vars
+        #
+        varList = [
+            'domain', 'host', 'user_name', 'ssh_port', 'ssh_key',
+            'grafana', 'grafana_dashbord_name', 'grafana_host',
+            'path_qstat', 'path_qsub', 'path_vsub', 'path_vtorque_log',
+            'execution_dir', 'poll_time_qstat']
+        # Read in the file
+        with open(hpcConfigPath, 'r') as file :
+            fileContent = file.read()
+        # Replace the target string
+        for key in varList:
+          fileContent = fileContent.replace('__'+key+'__', os.environ[key])
+        # Write the file out again
+        with open(hpcConfigPath, 'w') as file:
+            file.write(filedata)
+
+        # load JSON
         self.config_dict = self._get_config_dict(hpcConfigPath)
         self.logger.debug('{}'.format(self.config_dict))
         try:
