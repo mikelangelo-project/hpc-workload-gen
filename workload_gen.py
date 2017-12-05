@@ -13,9 +13,10 @@ jobID = None
 
 
 def run(context):
+    workloadDef = context.v1.workload
     # logging
     logger.info("HPC workload generator '{}' starting.".format(workloadDef.name))
-    workloadDef = context.v1.workload
+    # get the helper
     exp_helper = utils.ExperimentHelper(context)
     # initialize experiment configuration
     experimentCfg = ExperimentConfig(workloadDef)
