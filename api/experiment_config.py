@@ -34,7 +34,7 @@ class ExperimentConfig(object):
         self.logger = getLogger(__name__)
         self.logger.debug('Initialize class')
         # parse and validate experiments
-        self.__load_config(workloadDef)
+        self.__load_experiment(workloadDef)
 
 
     def __load_experiment(self, experimentCfg):
