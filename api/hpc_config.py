@@ -77,7 +77,7 @@ class HPCBackendConfiguration(object):
           fileContent = fileContent.replace('__'+key+'__', os.environ[key])
         # Write the file out again
         with open(hpcConfigPath, 'w') as file:
-            file.write(filedata)
+            file.write(fileContent)
 
         # load JSON
         self.config_dict = self._get_config_dict(hpcConfigPath)
