@@ -330,13 +330,15 @@ class HPCBackend(object):
             # transfer experiment data dir
             self.logger.debug("Staging experiment dir '{}' to HPC system..".format(experimentCfg.get_input_data()))
             rsync_output = rsync(
-                "-azvg", "--delete", experimentCfg.get_input_data(), '{}:{}'.format(
+                "-azvg", "--delete", experimentCfg.get_input_data(), '{}@{}:{}'.format(
+                    self.hpcConfig.get_value('user_name'),
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
             self.logger.debug('rsync output:\n{}'.format(rsync_output))
             # transfer job script
             rsync_output = rsync(
-                "-azvg", "--delete", job_script, '{}:{}'.format(
+                "-azvg", "--delete", job_script, '{}@{}:{}'.format(
+                    self.hpcConfig.get_value('user_name'),
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
             self.logger.debug('rsync output:\n{}'.format(rsync_output))
