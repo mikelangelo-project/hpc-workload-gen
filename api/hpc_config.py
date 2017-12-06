@@ -78,7 +78,7 @@ class HPCBackendConfiguration(object):
         for key in varList:
             value = os.getenv(key, '')
             if not value:
-                self.logging.warning("Key '{}' not found in environment, aborting.".format(key))
+                self.logger.warning("Key '{}' not found in environment, aborting.".format(key))
                 sys.exit(1)
             self.logger.debug(
                 "Replacing key '{}' in config template with value '{}'"
