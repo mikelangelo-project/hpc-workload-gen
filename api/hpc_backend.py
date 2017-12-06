@@ -255,6 +255,7 @@ class HPCBackend(object):
         """Submit the job to qsub, returns job_id."""
         self.logger.info('Submitting experiment to HPC system.')
 
+        exec_dir = self.hpcConfig.get_value('exec_dir')
         job_script = os.path.basename(experiment.get_job_script())
 
         arg_list = self._build_qsub_args(experiment)
@@ -267,11 +268,12 @@ class HPCBackend(object):
             )
 
             # job submit depends on either vm job or not
+            submission_cmd = "cd '{}';".format(exec_dir)
             if experiment.is_vm_job():
                 self.logger.info('VM job detected')
-                submission_cmd = self.hpcConfig.path_vsub;
+                submission_cmd += self.hpcConfig.path_vsub;
             else:
-                submission_cmd = self.hpcConfig.path_qsub;
+                submission_cmd += self.hpcConfig.path_qsub;
                 self.logger.info('Bare-metal job detected.')
             self.logger.info(
                 'using command \'{}\' for job submission.'.format(
