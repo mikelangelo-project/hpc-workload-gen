@@ -255,7 +255,7 @@ class HPCBackend(object):
         """Submit the job to qsub, returns job_id."""
         self.logger.info('Submitting experiment to HPC system.')
 
-        exec_dir = self.hpcConfig.get_value('exec_dir')
+        exec_dir = self.hpcConfig.get_value('execution_dir')
         job_script = os.path.basename(experiment.get_job_script())
 
         arg_list = self._build_qsub_args(experiment)
