@@ -73,13 +73,18 @@ class HPCBackendConfiguration(object):
         # Read in the file
         with open(hpcConfigPath, 'r') as file :
             fileContent = file.read()
+
         # Replace the target string
         for key in varList:
-            value = os.getenv(key)
+            value = os.getenv(key, '')
+            if not value:
+                self.logging.warning("Key '{}' not found in environment, aborting.".format(key))
+                sys.exit(1)
             self.logger.debug(
                 "Replacing key '{}' in config template with value '{}'"
                 .format(key, value))
             fileContent = fileContent.replace('__'+key+'__', value)
+
         # Write the file out again
         with open(hpcConfigPath, 'w') as file:
             file.write(fileContent)
