@@ -19,7 +19,7 @@ def _initLogger(name):
     logger.setLevel(logging.INFO)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    if os.environ('log_level'):
+    if os.environ['log_level']:
         ch.setLevel(logging[os.environ('log_level')])
     else:
         ch.setLevel(logging.INFO)
