@@ -20,7 +20,7 @@ def _initLogger(name):
     # create console handler with a higher log level
     ch = logging.StreamHandler()
     if os.environ('log_level'):
-        ch.setLevel(os.environ('log_level'))
+        ch.setLevel(logging[os.environ('log_level')])
     else:
         ch.setLevel(logging.INFO)
     # create formatter and add it to the handlers
