@@ -75,10 +75,11 @@ class HPCBackendConfiguration(object):
             fileContent = file.read()
         # Replace the target string
         for key in varList:
+            value = os.getenv(key)
             self.logger.debug(
                 "Replacing key '{}' in config template with value '{}'"
-                .format(key, os.environ[key]))
-            fileContent = fileContent.replace('__'+key+'__', os.environ[key])
+                .format(key, value))
+            fileContent = fileContent.replace('__'+key+'__', value)
         # Write the file out again
         with open(hpcConfigPath, 'w') as file:
             file.write(fileContent)
