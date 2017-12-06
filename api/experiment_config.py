@@ -39,7 +39,7 @@ class ExperimentConfig(object):
 
     def __load_experiment(self, experimentCfg):
         """Validate experiment's YAML, parsed/provided by scotty."""
-        
+
         """
         Expected structure for experiment configuration:
         experiment:
@@ -51,9 +51,9 @@ class ExperimentConfig(object):
               qsub_args: "-l nodes=1:debug                    [optional]
               vsub_args: "-vm vcpus=4 -vm ram=8012M"          [optional]
         """
-        
+
         self.logger.debug('Validating experiment configuration')
-        
+
         try:
             # mandatory parameters
             experimentCfg.name
@@ -67,7 +67,7 @@ class ExperimentConfig(object):
                 'Mandatory parameter \'{}\' is missing.'.format(e.args[0])
             )
             sys.exit(1)
-        
+
         # apply values
         self.name = experimentCfg.name
         self.job_script = self.unifyPath(experimentCfg.params['job_script'])
@@ -77,7 +77,7 @@ class ExperimentConfig(object):
         #experiment['remote'] = {}
         #experiment['remote']['experiment_dir'] = os.path.basename(experiment['params']['experiment_dir'])
         #experiment['remote']['job_script'] = os.path.basename(experiment['params']['job_script'])
-        
+
         # check if the experiment data path is relative or absolute
         #if not os.path.isabs(experiment['experiment_dir']):
         #    newPath = os.getcwd() + '/' + self.experiment['experiment_dir']
@@ -91,7 +91,7 @@ class ExperimentConfig(object):
         #
         # optional params
         #
-        
+
         if 'qsub_args' in experimentCfg.params:
             self.qsub_args = experimentCfg.params['qsub_args']
 
@@ -100,6 +100,9 @@ class ExperimentConfig(object):
 
         if 'input_data' in experimentCfg.params:
             self.input_data = self.unifyPath(experimentCfg.params['input_data'])
+            # remove trailing slash
+            if self.input_data.endswith('/'):
+                self.input_data = self.input_data[:-1]
 
         if "hpc_config" in experimentCfg.params:
             hpcConfigPath = self.unifyPath(experimentCfg.params['hpc_config'])

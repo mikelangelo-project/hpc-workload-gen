@@ -99,19 +99,16 @@ class HPCBackendConfiguration(object):
             self.grafana_host = self.config_dict['grafana_host']
             self.grafana_dashbord_name = self.config_dict['grafana_dashbord_name']
 
+            self.grafana_base_string = str(
+                self.config_dict['grafana_dashbord_url'].format(self.grafana_host, self.grafana_dashbord_name)
+            )
+
         except (KeyError) as e:
             self.logger.warning(
                 '\nConfig file \'{}\'is missing key \'{}\'. Backup your file, delete the'
                 ' origin file and rerun. A new configuration file will be created.'.format(path, e.args[0])
             )
             sys.exit(1)
-
-        # non changeable parameters
-        self.grafana_base_string = str(
-            'https://{}/dashboard/db/{}?'
-            'panelId=1&'
-            'fullscreen&'.format(self.grafana_host, self.grafana_dashbord_name)
-        )
 
 
     def _get_config_dict(self, path):
