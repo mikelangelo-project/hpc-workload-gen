@@ -23,6 +23,8 @@
 
 import sys
 import os
+import logging
+
 from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
 
