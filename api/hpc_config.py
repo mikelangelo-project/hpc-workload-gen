@@ -80,6 +80,8 @@ class HPCBackendConfiguration(object):
             if not value:
                 self.logger.warning("Key '{}' not found in environment, aborting.".format(key))
                 sys.exit(1)
+            else:
+                self.logger.debug("Key '{}'='{}' found in environment.".format(key, value))
             self.logger.debug(
                 "Replacing key '{}' in config template with value '{}'"
                 .format(key, value))
