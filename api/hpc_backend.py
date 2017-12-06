@@ -56,8 +56,9 @@ class HPCBackend(object):
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)
         # set log level for 'sh' to WARNING
-        logging.getLogger(rsync).setLevel(logging.WARNING)
-        logging.getLogger(ssh).setLevel(logging.WARNING)
+        #logging.getLogger('rsync').setLevel(logging.WARNING)
+        #logging.getLogger('ssh').setLevel(logging.WARNING)
+        logging.getLogger('sh.command.process').setLevel(logging.WARNING)
 
     def _get_job_state(self, experiment):
         """ Determines current job state with qstat"""
