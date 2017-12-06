@@ -111,16 +111,21 @@ class HPCBackendConfiguration(object):
             self.grafana_host = self.config_dict['grafana_host']
             self.grafana_dashbord_name = self.config_dict['grafana_dashbord_name']
 
-            self.grafana_base_string = str(
-                self.config_dict['grafana_dashbord_url'].format(self.grafana_host, self.grafana_dashbord_name)
-            )
+            #self.grafana_base_string = str(self.config_dict['grafana_dashbord_url']).format(
+            #    self.grafana_host, self.grafana_dashbord_name)
 
-        except (KeyError) as e:
+        except Error as e:
             self.logger.warning(
                 '\nConfig file \'{}\' parsing failed, error msg: \'{}\''.format(
-                    hpcConfigPath, str(e))
-            )
+                    hpcConfigPath, str(e)))
             sys.exit(1)
+
+        # non changeable parameters
+        self.grafana_base_string = str(
+            'https://{}/dashboard/db/{}?'
+            'panelId=1&'
+            'fullscreen&'.format(self.grafana_host, self.grafana_dashbord_name)
+        )
 
 
     def _get_config_dict(self, path):
@@ -139,7 +144,7 @@ class HPCBackendConfiguration(object):
         except (ValueError) as e:
             # display json errors
             self.logger.error(
-                'something is wrong with the json file.\n{}'.format(e))
+                "Something is wrong with the json file '{}', error is:\n.\n{}".format(path, e))
             sys.exit(1)
         self.logger.debug(
             json.dumps(config_dict, sort_keys=True, indent=4)
@@ -159,7 +164,8 @@ class HPCBackendConfiguration(object):
             'path_vsub': '/opt/vtorque/vsub',
             'grafana': True,
             'grafana_host': 'localhost',
-            'grafana_dashbord_name': 'playground'
+            'grafana_dashbord_name': 'playground',
+            'grafan_dashboard_url': 'https://{}/dashboard/db/{}?panelId=1&fullscreen'
         }
         return return_dict
 
