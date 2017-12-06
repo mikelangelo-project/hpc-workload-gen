@@ -53,6 +53,8 @@ class HPCBackend(object):
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)
+        # set log level for 'sh' to WARNING
+        logging.getLogger(sh.command.process).setLevel(logging.WARNING)
 
     def _get_job_state(self, experiment):
         """ Determines current job state with qstat"""
@@ -336,14 +338,19 @@ class HPCBackend(object):
                     self.hpcConfig.get_value('user_name'),
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
-            self.logger.debug('rsync output:\n{}'.format(rsync_output))
+            self.logger.debug(
+                "rsync return code is '{}', output:\n{}".format(
+                    rsync_output.error_code, rsync_output))
+
             # transfer job script
             rsync_output = rsync(
                 "-pzvr", job_script, '{}@{}:{}'.format(
                     self.hpcConfig.get_value('user_name'),
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
-            self.logger.debug('rsync output:\n{}'.format(rsync_output))
+            self.logger.debug(
+                "rsync return code is '{}', output:\n{}".format(
+                        rsync_output.error_code, rsync_output))
 
         except ErrorReturnCode as e:
             self.logger.error('Staging data failed:\n{}'.format(e.stderr))
