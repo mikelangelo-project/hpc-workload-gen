@@ -105,8 +105,7 @@ class HPCBackendConfiguration(object):
 
         except (KeyError) as e:
             self.logger.warning(
-                '\nConfig file \'{}\'is missing key \'{}\'. Backup your file, delete the'
-                ' origin file and rerun. A new configuration file will be created.'.format(path, e.args[0])
+                '\nConfig file \'{}\'is missing key \'{}\''
             )
             sys.exit(1)
 
