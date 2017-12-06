@@ -2,7 +2,7 @@
 
 
 import logging
-
+import os
 
 loggers = {}
 
@@ -19,7 +19,10 @@ def _initLogger(name):
     logger.setLevel(logging.INFO)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    if os.environ('log_level'):
+        ch.setLevel(os.environ('log_level'))
+    else:
+        ch.setLevel(logging.INFO)
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
