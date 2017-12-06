@@ -107,8 +107,10 @@ class ExperimentConfig(object):
         if "hpc_config" in experimentCfg.params:
             hpcConfigPath = self.unifyPath(experimentCfg.params['hpc_config'])
         else:
-            # default file is picked
-            hpcConfigPath = self.unifyPath("./example/hpc_backend.cfg")
+            self.logger.error("HPC back-end configuration file not found.")
+            sys.exit(1)
+
+        # initialize HPC back-end config
         self.hpc_config = HPCBackendConfiguration(hpcConfigPath)
 
 
