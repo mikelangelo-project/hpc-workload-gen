@@ -343,8 +343,7 @@ class HPCBackend(object):
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
             self.logger.debug(
-                "rsync return code is '{}', output:\n{}".format(
-                    rsync_output.error_code, rsync_output))
+                "rsync output:\n{}".format(rsync_output))
 
             # transfer job script
             rsync_output = rsync(
@@ -353,8 +352,7 @@ class HPCBackend(object):
                     self.hpcConfig.get_value('host'),
                     self.hpcConfig.get_value('execution_dir')))
             self.logger.debug(
-                "rsync return code is '{}', output:\n{}".format(
-                        rsync_output.error_code, rsync_output))
+                "rsync output:\n{}".format(rsync_output))
 
         except ErrorReturnCode as e:
             self.logger.error('Staging data failed:\n{}'.format(e.stderr))
