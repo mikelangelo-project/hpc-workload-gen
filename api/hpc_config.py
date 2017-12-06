@@ -105,7 +105,8 @@ class HPCBackendConfiguration(object):
 
         except (KeyError) as e:
             self.logger.warning(
-                '\nConfig file \'{}\'is missing key \'{}\''
+                '\nConfig file \'{}\' parsing failed, error msg: \'{}\''.format(
+                    hpcConfigPath, e.msg)
             )
             sys.exit(1)
 
