@@ -66,7 +66,7 @@ class HPCBackendConfiguration(object):
         #
         varList = [
             'domain', 'host', 'user_name', 'ssh_port', 'ssh_key',
-            'grafana', 'grafana_dashbord_name', 'grafana_host', 'grafana_dashborad_url',
+            'grafana', 'grafana_dashbord_name', 'grafana_host', 'grafana_dashboard_url',
             'path_qstat', 'path_qsub', 'path_vsub', 'path_vtorque_log',
             'execution_dir', 'poll_time_qstat']
 
