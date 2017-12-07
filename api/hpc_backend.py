@@ -23,7 +23,6 @@
 
 import sys
 import os
-import logging
 
 from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
@@ -55,10 +54,6 @@ class HPCBackend(object):
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)
-        # set log level for 'sh' to WARNING
-        #logging.getLogger('rsync').setLevel(logging.WARNING)
-        #logging.getLogger('ssh').setLevel(logging.WARNING)
-        logging.getLogger('sh.command.process').setLevel(logging.WARNING)
 
     def _get_job_state(self, experiment):
         """ Determines current job state with qstat"""

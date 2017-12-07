@@ -3,6 +3,7 @@
 
 import logging
 import os
+import sh
 
 loggers = {}
 
@@ -16,7 +17,7 @@ def _initLogger(name):
     """Setup the requested logger."""
     # log setup
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.__dict__[os.getenv('log_level', 'INFO')])
     # create console handler with a higher log level
     ch = logging.StreamHandler()
     ch.setLevel(getattr(logging, os.getenv('log_level', 'INFO')))
@@ -28,3 +29,6 @@ def _initLogger(name):
     logger.addHandler(ch)
     logger.debug('Logger initialized for \'{}\''.format(name))
     loggers[name] = logger
+    # set log level for 'sh' (rsync/ssh) to WARNING
+    logging.getLogger(sh.command.process).setLevel(logging.WARNING)
+    logging.getLogger(rsync).setLevel(logging.WARNING)
