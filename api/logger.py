@@ -29,6 +29,9 @@ def _initLogger(name):
     logger.addHandler(ch)
     logger.debug('Logger initialized for \'{}\''.format(name))
     loggers[name] = logger
+
+
+def reduceLogLevel():
     # set log level for 'sh' (rsync/ssh) to WARNING
     logging.getLogger(rsync).setLevel(logging.WARNING)
     logging.getLogger(ssh).setLevel(logging.WARNING)
