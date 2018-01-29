@@ -27,7 +27,7 @@ import os
 from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
 
-from api.logger import getLogger
+from api.logger import getLogger, reduceLogLevel
 from api.hpc_config import HPCBackendConfiguration
 
 
