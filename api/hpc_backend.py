@@ -289,14 +289,14 @@ class HPCBackend(object):
         try:
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
         except ErrorReturnCode as e:
-            self.logger.error('\nError in ssh call:\n{}'.format(e))
-            print e.stderr
+            self.logger.error("\nError in ssh call:\n{}".format(e))
+            self.logger.error("\n------\n{}\n------\n".format(e.stderr))
             sys.exit(1)
         self.logger.debug("SSH output:\n%s", ssh_output)
 
         # searching job id
         for line in ssh_output:
-            self.logger.debug('searching for job id in \n{}'.format(line))
+            self.logger.debug("searching for job id in \n{}".format(line))
             # job failed ?
             if "error" in line:
                 self.logger.info("Job submission failed!\n %s", line)
@@ -319,7 +319,7 @@ class HPCBackend(object):
                 return
             # job ID not found in output
             self.logger.error(
-                'no job id found in \n{}\nexiting!'.format(ssh_output)
+                "No job id found in ssh-output:\n-----\n{}\n-----\nexiting!".format(ssh_output)
             )
             sys.exit(1)
 
