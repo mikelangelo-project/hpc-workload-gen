@@ -1,9 +1,8 @@
 
-
-
 import logging
 import os
 import sh
+
 
 loggers = {}
 
@@ -31,13 +30,16 @@ def _initLogger(name):
     loggers[name] = logger
 
 
-def reduceLogLevel():
+def setLogLevel(logLevel=logging.WARNING):
     # set log level for 'sh' (rsync/ssh) to WARNING
-    logging.getLogger(rsync).setLevel(logging.WARNING)
-    logging.getLogger(ssh).setLevel(logging.WARNING)
-    logging.getLogger(ssh.command.process.streamwriter).setLevel(logging.WARNING)
-    logging.getLogger(sh).setLevel(logging.WARNING)
-    logging.getLogger(sh.stream_bufferer).setLevel(logging.WARNING)
-    logging.getLogger(sh.streamreader).setLevel(logging.WARNING)
-    logging.getLogger(sh.command.process).setLevel(logging.WARNING)
-    logging.getLogger(sh.command.process.streamreader).setLevel(logging.WARNING)
+    modList = [ 
+        "ssh", "rsync", "sh", 
+        "sh.stream_bufferer", "sh.streamreader", 
+        "sh.command.process", "sh.command.process.streamreader" ]
+    for module in modList:
+        try:
+            lgr = logging.getLogger(module)
+            lgr.setLevel(logging.WARNING)
+        except Exception as e:
+            pass
+
