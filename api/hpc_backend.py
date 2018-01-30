@@ -27,7 +27,7 @@ import os
 from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
 
-from api.logger import getLogger, reduceLogLevel
+from api.logger import getLogger, setLogLevel
 from api.hpc_config import HPCBackendConfiguration
 
 
@@ -51,7 +51,7 @@ class HPCBackend(object):
             self.ssh_conn = ssh.bake('-p', self.hpcConfig.get_value('ssh_port'))
             self.ssh_conn = ssh.bake('-i', self.hpcConfig.get_value('ssh_key'))
             self.ssh_conn = ssh.bake(self.hpcConfig.get_value('host'))
-            reduceLogLevel()
+            setLogLevel()
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)
