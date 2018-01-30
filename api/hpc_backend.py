@@ -288,12 +288,11 @@ class HPCBackend(object):
 
         try:
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
-            self.logger.debug("SSH output:\n%s", ssh_output)
         except ErrorReturnCode as e:
-            self.logger.error("SSH output:\n%s", ssh_output)
             self.logger.error('\nError in ssh call:\n{}'.format(e))
             print e.stderr
             sys.exit(1)
+        self.logger.debug("SSH output:\n%s", ssh_output)
 
         # searching job id
         for line in ssh_output:
