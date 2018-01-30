@@ -30,17 +30,22 @@ def _initLogger(name):
     loggers[name] = logger
 
 
-def setLogLevel(logLevel=logging.WARNING):
-    # set log level for 'sh' (rsync/ssh) to WARNING
-    modList = [
-        "ssh", "rsync", "sh",
-        "sh.stream_bufferer", "sh.streamreader",
-        "sh.command.process", "sh.command.process.streamreader",
-        "api.hpc_backend", "api.experiment_config", "api.hpc_config" ]
+def setLogLevel(logLevel=os.getenv('log_level', logging.WARNING), moduleName=None):
+    # module name provided ?
+    if moduleName is None:
+        modList = [
+            "ssh", "rsync", "sh",
+            "sh.stream_bufferer", "sh.streamreader",
+            "sh.command.process", "sh.command.process.streamreader",
+            "api.hpc_backend", "api.experiment_config", "api.hpc_config" ]
+    else:
+        modList = [ moduleName ]
+
+    # set log level
     for module in modList:
         try:
             lgr = logging.getLogger(module)
-            lgr.setLevel(logging.WARNING)
+            lgr.setLevel(logLevel)
         except Exception as e:
             pass
 
