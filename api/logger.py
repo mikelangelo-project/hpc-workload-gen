@@ -32,10 +32,11 @@ def _initLogger(name):
 
 def setLogLevel(logLevel=logging.WARNING):
     # set log level for 'sh' (rsync/ssh) to WARNING
-    modList = [ 
-        "ssh", "rsync", "sh", 
-        "sh.stream_bufferer", "sh.streamreader", 
-        "sh.command.process", "sh.command.process.streamreader" ]
+    modList = [
+        "ssh", "rsync", "sh",
+        "sh.stream_bufferer", "sh.streamreader",
+        "sh.command.process", "sh.command.process.streamreader",
+        "api.hpc_backend", "api.experiment_config", "api.hpc_config" ]
     for module in modList:
         try:
             lgr = logging.getLogger(module)
