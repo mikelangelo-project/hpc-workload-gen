@@ -270,7 +270,7 @@ class HPCBackend(object):
             )
 
             # job submit depends on either vm job or not
-            submission_cmd = "cd '{}';".format(exec_dir)
+            submission_cmd = "cd {};".format(exec_dir)
             if experiment.is_vm_job():
                 self.logger.info('VM job detected')
                 submission_cmd += self.hpcConfig.path_vsub;
