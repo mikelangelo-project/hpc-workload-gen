@@ -264,63 +264,64 @@ class HPCBackend(object):
         arg_list.append(job_script)
         self.logger.info('Batch-System arguments:\n{}'.format(arg_list))
 
+        self.logger.debug(
+            '{} {}'.format(self.hpcConfig.path_qsub, arg_list)
+        )
+
+        # job submit depends on either vm job or not
+        submission_cmd = "cd {}; ".format(exec_dir)
+        if experiment.is_vm_job():
+            self.logger.info('VM job detected')
+            submission_cmd += self.hpcConfig.path_vsub;
+        else:
+            submission_cmd += self.hpcConfig.path_qsub;
+            self.logger.info('Bare-metal job detected.')
+        self.logger.info(
+            'using command \'{}\' for job submission.'.format(
+                submission_cmd))
+
+        # get stating time and convert
+        experiment.set_start_time(int(time()) * 1000)
+        self.logger.debug(
+            'stat time stamp: {}'.format(experiment.get_start_time())
+        )
+
         try:
-            self.logger.debug(
-                '{} {}'.format(self.hpcConfig.path_qsub, arg_list)
-            )
-
-            # job submit depends on either vm job or not
-            submission_cmd = "cd '{}'; ".format(exec_dir)
-            if experiment.is_vm_job():
-                self.logger.info('VM job detected')
-                submission_cmd += self.hpcConfig.path_vsub;
-            else:
-                submission_cmd += self.hpcConfig.path_qsub;
-                self.logger.info('Bare-metal job detected.')
-            self.logger.info(
-                'using command \'{}\' for job submission.'.format(
-                    submission_cmd))
-
-            # get stating time and convert
-            experiment.set_start_time(int(time()) * 1000)
-            self.logger.debug(
-                'stat time stamp: {}'.format(experiment.get_start_time())
-            )
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
             self.logger.debug("SSH output:\n%s", ssh_output)
+        except ErrorReturnCode as e:
+            self.logger.error("SSH output:\n%s", ssh_output)
+            self.logger.error('\nError in ssh call:\n{}'.format(e))
+            print e.stderr
+            sys.exit(1)
 
-            # searching job id
-            for line in ssh_output:
-                self.logger.debug('searching for job id in \n{}'.format(line))
-                # job failed ?
-                if "error" in line:
-                    self.logger.info("Job submission failed!\n %s", line)
-                    sys.exit(1)
-                elif self.hpcConfig.domain in line:
-                    self.logger.debug('Job id found: {}'.format(line))
-                    experiment.set_job_id(str(line))
-                    if self.hpcConfig.grafana:
-                        self.logger.info(
-                            'Job performance data at:\n'
-                            '{}var-JobId=snapTask-{}-{}&'
-                            'from={}&'
-                            'to=now'.format(
-                                self.hpcConfig.grafana_base_string,
-                                self.hpcConfig.user_name,
-                                experiment.get_job_id().rstrip(),
-                                experiment.get_start_time()
-                            )
+        # searching job id
+        for line in ssh_output:
+            self.logger.debug('searching for job id in \n{}'.format(line))
+            # job failed ?
+            if "error" in line:
+                self.logger.info("Job submission failed!\n %s", line)
+                sys.exit(1)
+            elif self.hpcConfig.domain in line:
+                self.logger.debug('Job id found: {}'.format(line))
+                experiment.set_job_id(str(line))
+                if self.hpcConfig.grafana:
+                    self.logger.info(
+                        'Job performance data at:\n'
+                        '{}var-JobId=snapTask-{}-{}&'
+                        'from={}&'
+                        'to=now'.format(
+                            self.hpcConfig.grafana_base_string,
+                            self.hpcConfig.user_name,
+                            experiment.get_job_id().rstrip(),
+                            experiment.get_start_time()
                         )
-                    return
-
+                    )
+                return
+            # job ID not found in output
             self.logger.error(
                 'no job id found in \n{}\nexiting!'.format(ssh_output)
             )
-            sys.exit(1)
-
-        except ErrorReturnCode as e:
-            self.logger.error('\nError in ssh call:\n{}'.format(e))
-            print e.stderr
             sys.exit(1)
 
 
