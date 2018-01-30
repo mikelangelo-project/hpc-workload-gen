@@ -7,7 +7,7 @@ import yaml
 import os
 import re
 
-from api.logger import getLogger
+from api.logger import getLogger, setLogLevel
 from api.hpc_config import HPCBackendConfiguration
 
 
@@ -33,9 +33,9 @@ class ExperimentConfig(object):
         # logging
         self.logger = getLogger(__name__)
         self.logger.debug('Initialize class')
+        setLogLevel()
         # parse and validate experiments
         self.__load_experiment(workloadDef)
-
 
     def __load_experiment(self, experimentCfg):
         """Validate experiment's YAML, parsed/provided by scotty."""

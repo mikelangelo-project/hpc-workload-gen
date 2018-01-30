@@ -25,7 +25,7 @@ from __future__ import with_statement
 import sys
 import json
 import os
-from api.logger import getLogger
+from api.logger import getLogger, setLogLevel
 
 
 class HPCBackendConfiguration(object):
@@ -53,7 +53,7 @@ class HPCBackendConfiguration(object):
         self.user_name = 'jenkins'
         """
         self.logger = getLogger(__name__)
-
+        setLogLevel()
         # ensure file exists
         if hpcConfigPath is None or not os.path.isfile(hpcConfigPath):
             self.logger.error(
