@@ -138,7 +138,7 @@ class HPCBackend(object):
         """Wait for the job to finish."""
         job_running = True
         job_id = experiment.get_job_id()
-        self.logger.info("Job '{}' submitted, waiting for completion.\nMay can take "
+        self.logger.info("Job '{}' submitted, waiting for completion. May can take "
                  "quite some time, so please be patient ...".format(job_id))
         sleeping_time = 5  # seconds
         while job_running:

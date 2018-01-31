@@ -164,7 +164,7 @@ class ExperimentConfig(object):
     def set_job_id(self, jobID):
         if self.job_id is not None:
             raise Exception("Job ID cannot be overridden")
-        self.job_id = jobID
+        self.job_id = jobID.replace('\n', '').replace('\r', '')
         self.stripped_job_id = re.findall('^\d+',jobID)[0]
 
 
