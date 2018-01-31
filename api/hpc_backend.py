@@ -31,7 +31,7 @@ from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
 from logging import WARNING, DEBUG
 
-from api.logger import getLogger, setLogLevel
+from api.logger import getLogger, setLogLevel, muteSH
 from api.hpc_config import HPCBackendConfiguration
 
 
@@ -56,7 +56,7 @@ class HPCBackend(object):
             self.ssh_conn = ssh.bake('-i', self.hpcConfig.get_value('ssh_key'))
             self.ssh_conn = ssh.bake(self.hpcConfig.get_value('host'))
             # enforce desired log level
-            setLogLevel()
+            muteSH()
             getLogger("sh.command").setLevel(WARNING)
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
@@ -361,10 +361,6 @@ class HPCBackend(object):
             self._print_log('STDERR', experiment)
             if experiment.is_vm_job():
                 self._print_log('VTORQUE_DEBUG_LOG', experiment)
-
-    def _clean_up(self):
-        """Remove all files that are generated during the run."""
-        raise NotImplementedError
 
 
     def cleanUp(self, jobID):

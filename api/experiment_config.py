@@ -29,7 +29,7 @@ import yaml
 import os
 import re
 
-from api.logger import getLogger, setLogLevel
+from api.logger import getLogger, setLogLevel, muteSH
 from api.hpc_config import HPCBackendConfiguration
 
 
@@ -55,7 +55,7 @@ class ExperimentConfig(object):
         # logging
         self.logger = getLogger(__name__)
         self.logger.debug('Initialize class')
-        setLogLevel()
+        muteSH();
         # parse and validate experiments
         self.__load_experiment(workloadDef)
 

@@ -56,7 +56,17 @@ def _initLogger(name):
     loggers[name] = logger
 
 
-def setLogLevel(logLevel=None, moduleName=None, logFileFlag=False):
+def muteSH():
+    modList = [
+        "ssh", "rsync", "sh",
+        "sh.stream_bufferer", "sh.streamreader",
+        "sh.command.process", "sh.command.process.streamreader" ]
+    # set log level
+    for module in modList:
+        logging.getLogger(module).setLevel(logging.WARNING)
+
+
+def setLogLevel(logLevel=None, moduleName=None, logFileFlag=None):
 
     # log_level provided ?
     if not logLevel:
@@ -69,28 +79,20 @@ def setLogLevel(logLevel=None, moduleName=None, logFileFlag=False):
 
     # module name provided ?
     if moduleName is None:
-        modList = [
-            "ssh", "rsync", "sh",
-            "sh.stream_bufferer", "sh.streamreader",
-            "sh.command.process", "sh.command.process.streamreader",
-            "api.hpc_backend", "api.experiment_config", "api.hpc_config" ]
+        # all loggers
+        log = logging.getLogger()
     else:
-        modList = [ moduleName ]
-
-    # set log level
-    for module in modList:
-        # get module'S logger
+        # get module's logger
         log = logging.getLogger(module)
-        # get all handlers
-        for hdlr in log.handlers[:]:
-            try:
-                # log file or console handler ?
-                if logFileFlag and isinstance(hdlr, logging.FileHandler):
-                    hdlr.setLevel(logLevel)
-                    break
-                elif not logFileFlag:
-                    hdlr.setLevel(logLevel)
-                    break
-            except Exception as e:
-                pass
+
+    # get all handlers
+    for hdlr in log.handlers[:]:
+        # log file or console handler ?
+        if logFileFlag is None:
+            # no limitation to console or log file
+            hdlr.setLevel(logLevel)
+        elif logFileFlag and isinstance(hdlr, logging.FileHandler):
+            hdlr.setLevel(logLevel)
+        elif not logFileFlag:
+            hdlr.setLevel(logLevel)
 
