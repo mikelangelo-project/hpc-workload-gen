@@ -161,26 +161,15 @@ class HPCBackend(object):
 
         qsub_args = experiment.get_qsub_args();
         if qsub_args is None:
-            self.logger.warning("Parameter 'qsub_args' not found.")
+            self.logger.info("Parameter 'qsub_args' not found.")
         else:
             arg_list.append(qsub_args)
 
         vsub_args = experiment.get_vsub_args();
         if vsub_args is None:
-            self.logger.warning("Parameter 'qsub_args' not found.")
+            self.logger.info("Parameter 'vsub_args' not found.")
         else:
             arg_list.append(vsub_args)
-
-#        if 'vtorque' in experiment['params']:
-#            vtorque = experiment['params']['vtorque']
-#            arg_list.append('-vm')  # indicates an vm job
-#            # get the keys (all are optional, swappable)
-#            arg_list_vtorque = []
-#            for key in vtorque:
-#                arg_list_vtorque.append('{}={}'.format(key, vtorque[key]))
-#           arg_list.append(','.join(arg_list_vtorque))
-#           self.logger.debug('arg_list= {}'.format(arg_list))
-
         self.logger.debug('returning arg list = {}'.format(arg_list))
         return arg_list
 
