@@ -56,7 +56,7 @@ def _initLogger(name):
     loggers[name] = logger
 
 
-def setLogLevel(logLevel=None, moduleName=None, logFileFlag=false):
+def setLogLevel(logLevel=None, moduleName=None, logFileFlag=False):
 
     # log_level provided ?
     if not logLevel:
