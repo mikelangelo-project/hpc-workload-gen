@@ -330,17 +330,23 @@ class HPCBackend(object):
         experiment_dir = experimentCfg.get_input_data()
         job_script = experimentCfg.get_job_script()
 
-        try:
-            # transfer experiment data dir
-            self.logger.debug("Staging experiment dir '{}' to HPC system..".format(experimentCfg.get_input_data()))
-            rsync_output = rsync(
-                "-pzvr", experimentCfg.get_input_data(), '{}@{}:{}'.format(
-                    self.hpcConfig.get_value('user_name'),
-                    self.hpcConfig.get_value('host'),
-                    self.hpcConfig.get_value('execution_dir')))
-            self.logger.debug(
-                "rsync output:\n{}".format(rsync_output))
+        # input data dir ?
+        if experiment_dir:
+            try:
+                # transfer input data dir
+                self.logger.debug("Staging experiment dir '{}' to HPC system..".format(experimentCfg.get_input_data()))
+                rsync_output = rsync(
+                    "-pzvr", experimentCfg.get_input_data(), '{}@{}:{}'.format(
+                        self.hpcConfig.get_value('user_name'),
+                        self.hpcConfig.get_value('host'),
+                        self.hpcConfig.get_value('execution_dir')))
+                self.logger.debug(
+                    "rsync output:\n{}".format(rsync_output))
+            except ErrorReturnCode as e:
+                self.logger.error('Staging input data failed:\n{}'.format(e.stderr))
+                raise e
 
+        try:
             # transfer job script
             rsync_output = rsync(
                 "-pzvr", job_script, '{}@{}:{}'.format(
@@ -349,9 +355,8 @@ class HPCBackend(object):
                     self.hpcConfig.get_value('execution_dir')))
             self.logger.debug(
                 "rsync output:\n{}".format(rsync_output))
-
         except ErrorReturnCode as e:
-            self.logger.error('Staging data failed:\n{}'.format(e.stderr))
+            self.logger.error('Staging job script failed:\n{}'.format(e.stderr))
             raise e
 
 
