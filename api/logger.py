@@ -18,18 +18,15 @@ def _initLogger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.__dict__[os.getenv('log_level', 'INFO')])
 
-    # log file
-    logFile = os.getenv('log_file');
-    if logFile:
-      fh = logging.FileHandler(logFile)
-      fh.setLevel(getattr(logging, os.getenv('log_level_file', 'DEBUG')))
-
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    # apply handlers
+    # log file
+    logFile = os.getenv('log_file');
     if logFile:
+        fh = logging.FileHandler(logFile)
+        fh.setLevel(getattr(logging, os.getenv('log_level_file', 'DEBUG')))
         fh.setFormatter(formatter)
         logger.addHandler(fh)
 

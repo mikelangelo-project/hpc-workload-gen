@@ -253,7 +253,7 @@ class HPCBackend(object):
 
         arg_list = self._build_qsub_args(experiment)
         arg_list.append(job_script)
-        self.logger.info('Batch-System arguments:\n{}'.format(arg_list))
+        self.logger.info('Batch-System arguments:\n {}'.format(arg_list))
 
         self.logger.debug(
             '{} {}'.format(self.hpcConfig.path_qsub, arg_list)
@@ -297,7 +297,7 @@ class HPCBackend(object):
                 experiment.set_job_id(str(line))
                 if self.hpcConfig.grafana:
                     self.logger.info(
-                        'Job performance data at:\n'
+                        'Job performance available data at:\n  '
                         '{}var-JobId=snapTask-{}-{}&'
                         'from={}&'
                         'to=now'.format(
