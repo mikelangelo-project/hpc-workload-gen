@@ -137,15 +137,16 @@ class HPCBackend(object):
     def _wait_for_job(self, experiment):
         """Wait for the job to finish."""
         job_running = True
+        job_id = experiment.get_job_id()
         self.logger.info("Job '{}' submitted, waiting for completion.\nMay can take "
-                 "quite some time, so please be patient ...".format(self.job_id))
+                 "quite some time, so please be patient ...".format(job_id))
         sleeping_time = 5  # seconds
         while job_running:
             self.logger.debug("Sleeping for '{}' seconds".format(sleeping_time))
             sleep(sleeping_time)
             job_running = self._is_job_running(experiment)
-
-        self.logger.info("Job '{}' finished. Unblocking now.".format(self.job_id))
+        # done
+        self.logger.info("Job '{}' finished. Unblocking now.".format(job_id))
 
 
     def _build_qsub_args(self, experiment):
