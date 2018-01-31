@@ -281,7 +281,8 @@ class HPCBackend(object):
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
         except ErrorReturnCode as e:
             self.logger.error("Error in ssh call:\n{}".format(e))
-            self.logger.error("------\n{}\n------".format(sys.exc_info()[0]))
+            self.logger.error("SSH output:\n%s", ssh_output)
+            self.logger.error("\n------\n{}\n------".format(sys.exc_info()[0]))
             sys.exit(1)
         self.logger.debug("SSH output:\n%s", ssh_output)
 
@@ -358,7 +359,6 @@ class HPCBackend(object):
             self._print_log('STDERR', experiment)
             if experiment.is_vm_job():
                 self._print_log('VTORQUE_DEBUG_LOG', experiment)
-        # TODO store output in context that is returned to scotty
 
     def _clean_up(self):
         """Remove all files that are generated during the run."""

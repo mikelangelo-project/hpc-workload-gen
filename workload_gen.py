@@ -37,7 +37,7 @@ def run(context):
                "identifier": "submission host",
                "host" : hpcConfig.get_value('host')
             },
-            "data" : { #TODO
+            "data" : {
                 "stdout" : stdoutPath,
                 "stderr" : stdErrPath,
                 "vtorque_log" : vtorque_log
