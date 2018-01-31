@@ -24,10 +24,6 @@ def _initLogger(name):
       fh = logging.FileHandler(logFile)
       fh.setLevel(getattr(logging, os.getenv('log_level_file', 'DEBUG')))
 
-    # console log (lower level as default)
-    ch = logging.StreamHandler()
-    ch.setLevel(getattr(logging, os.getenv('log_level_console', 'INFO')))
-
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -36,7 +32,6 @@ def _initLogger(name):
     if logFile:
         fh.setFormatter(formatter)
         logger.addHandler(fh)
-    logger.addHandler(ch)
 
     # print debug msg
     logger.debug('Logger initialized for \'{}\''.format(name))
