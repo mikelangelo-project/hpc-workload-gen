@@ -154,18 +154,18 @@ class HPCBackendConfiguration(object):
 
     def _get_default_dict(self):
         return_dict = {
-            'host': 'submission-frontend',
-            'domain': 'mydomain',
-            'user_name': 'ci',
-            'poll_time_qstat': 5,
-            'execution_dir': './',
-            'path_qsub': '/usr/bin/qsub',
-            'path_qstat': '/usr/bin/qstat',
-            'path_vsub': '/opt/vtorque/vsub',
-            'grafana': True,
-            'grafana_host': 'localhost',
-            'grafana_dashbord_name': 'playground',
-            'grafan_dashboard_url': 'https://{}/dashboard/db/{}?panelId=1&fullscreen'
+            'host': '__host__',
+            'domain': '__domain__',
+            'user_name': '__user_name__',
+            'poll_time_qstat': __poll_time_qstat__,
+            'execution_dir': '__execution_dir__',
+            'path_qsub': '__path_qsub__',
+            'path_qstat': '__path_qstat__',
+            'path_vsub': '__path_vsub__',
+            'grafana': __grafana__,
+            'grafana_host': '__grafana_host__',
+            'grafana_dashbord_name': '__grafana_dashbord_name__',
+            'grafan_dashboard_url': '__grafan_dashboard_url__'
         }
         return return_dict
 
