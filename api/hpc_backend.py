@@ -98,56 +98,54 @@ class HPCBackend(object):
 
         if job_status == 'Q':
             self.logger.debug(
-                'Job with ID \'{}\' is queued.'.format(job_id))
+                "Job with ID '{}' is queued.".format(job_id))
             return True
         elif job_status == 'W':
             self.logger.debug(
-                'Job with ID \'{}\' is waiting for execution'.format(job_id))
+                "Job with ID '{}' is waiting for execution".format(job_id))
             return True
         if job_status == 'S':
             self.logger.debug(
-                'Job with ID \'{}\' is starting.'.format(job_id))
+                "Job with ID '{}' is starting.".format(job_id))
             return True
         elif job_status == 'R':
             self.logger.debug(
-                'Job with ID \'{}\' is running'.format(job_id))
+                "Job with ID '{}' is running".format(job_id))
             return True
         elif job_status == 'E':
             self.logger.debug(
-                'Job with ID \'{}\' is finishing, waiting for completion.'.format(job_id))
+                "Job with ID '{}' is finishing, waiting for completion.".format(job_id))
             return True
         elif job_status == 'C':
             self.logger.debug(
-                'Job with ID \'{}\' is completed.'.format(job_id))
+                "Job with ID '{}' is completed.".format(job_id))
             return False
         elif job_status == 'H':
             self.logger.error(
-                'Job with ID \'{}\' is on hold, aborting.'.format(job_id))
+                "Job with ID '{}' is on hold, aborting.".format(job_id))
             return False
         elif job_status is None:
             self.logger.debug(
-                'Job ID \'{}\' not found, assume finished'.format(job_id))
+                "Job ID '{}' not found, assume finished".format(job_id))
             return False
         else:
             self.logger.error(
-                '{} in an unknown state {}'.format(job_id, job_status))
+                "Job ID '{}' in an unknown state {}".format(job_id, job_status))
             return False
 
 
     def _wait_for_job(self, experiment):
         """Wait for the job to finish."""
-        self.logger.debug('Experiment job submitted, waiting for completion.')
         job_running = True
-
-        self.logger.info('Waiting for job {} to complete.\nMay can take '
-                         'quite some time, so please be patient ...'.format(experiment.get_job_id()))
+        self.logger.info("Job '{}' submitted, waiting for completion.\nMay can take "
+                 "quite some time, so please be patient ...".format(self.job_id))
         sleeping_time = 5  # seconds
         while job_running:
-            self.logger.debug('sleeping for {} seconds'.format(sleeping_time))
+            self.logger.debug("Sleeping for '{}' seconds".format(sleeping_time))
             sleep(sleeping_time)
             job_running = self._is_job_running(experiment)
 
-        self.logger.info('Job finished. Unblocking now.')
+        self.logger.info("Job '{}' finished. Unblocking now.".format(self.job_id))
 
 
     def _build_qsub_args(self, experiment):
