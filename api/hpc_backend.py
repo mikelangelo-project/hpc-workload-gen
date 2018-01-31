@@ -283,7 +283,9 @@ class HPCBackend(object):
         try:
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
         except ErrorReturnCode as e:
-            self.logger.error("Error '{}' in ssh call:\n{}".format(e.exit_code, e.full_cmd))
+            self.logger.error(
+                "Job failed. Error code '{}' for SSH cmd:\n {}".format(
+                    e.exit_code, e.full_cmd))
             sys.exit(1)
         self.logger.debug("SSH output:\n%s", ssh_output)
 
