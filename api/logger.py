@@ -17,20 +17,38 @@ def _initLogger(name):
     # log setup
     logger = logging.getLogger(name)
     logger.setLevel(logging.__dict__[os.getenv('log_level', 'INFO')])
-    # create console handler with a higher log level
+
+    # log file
+    logFile = os.getenv('log_file');
+    if logFile:
+      fh = logging.FileHandler()
+      fh.setLevel(getattr(logging, os.getenv('log_level_file', 'DEBUG')))
+
+    # console log (lower level as default)
     ch = logging.StreamHandler()
-    ch.setLevel(getattr(logging, os.getenv('log_level', 'INFO')))
+    ch.setLevel(getattr(logging, os.getenv('log_level_console', 'INFO')))
+
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    # add the handlers to the logger
+
+    # apply handlers
+    if logFile:
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
     logger.addHandler(ch)
+
+    # print debug msg
     logger.debug('Logger initialized for \'{}\''.format(name))
     loggers[name] = logger
 
 
-def setLogLevel(logLevel=os.getenv('log_level', logging.WARNING), moduleName=None):
+def setLogLevel(logLevel=None, moduleName=None):
+
+    # log_level provided or use defaults ?
+    logLevelFile = os.getenv('log_level_file', logging.DEBUG)
+    logLevelCons = os.getenv('log_level_console', logging.WARNING)
+
     # module name provided ?
     if moduleName is None:
         modList = [
@@ -45,7 +63,8 @@ def setLogLevel(logLevel=os.getenv('log_level', logging.WARNING), moduleName=Non
     for module in modList:
         try:
             lgr = logging.getLogger(module)
-            lgr.setLevel(logLevel)
+            lgr.setLevel(logLevelFile)
+            lgr.setLevel(logLevelCons)
         except Exception as e:
             pass
 
