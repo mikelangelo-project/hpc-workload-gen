@@ -141,8 +141,8 @@ class HPCBackend(object):
         """Wait for the job to finish."""
         job_running = True
         job_id = experiment.get_job_id()
-        self.logger.info("Job '{}' submitted, waiting for completion. May can take "
-                 "quite some time, so please be patient ...".format(job_id))
+        self.logger.info("Job '{}' submitted, waiting for completion."
+                 "  May take quite some time, so please be patient ...".format(job_id))
         sleeping_time = 5  # seconds
         while job_running:
             self.logger.debug("Sleeping for '{}' seconds".format(sleeping_time))
@@ -284,7 +284,6 @@ class HPCBackend(object):
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
         except ErrorReturnCode as e:
             self.logger.error("Error '{}' in ssh call:\n{}".format(e.exit_code, e.full_cmd))
-            self.logger.error("\n------\n{}\n------".format(sys.exc_info()[0]))
             sys.exit(1)
         self.logger.debug("SSH output:\n%s", ssh_output)
 
