@@ -1,4 +1,25 @@
+#!/usr/bin/env python
+#
+# Copyright 2018 HLRS, University of Stuttgart
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
+"""Logger Manager"""
+
+# @Author: Nico Struckmann, struckmann@hlrs.de
+# @COMPANY: HLRS, University of Stuttgart
+# @Date: 2018-01-31
 import logging
 import os
 import sh
@@ -35,10 +56,16 @@ def _initLogger(name):
     loggers[name] = logger
 
 
-def setLogLevel(logLevel=None, moduleName=None):
+def setLogLevel(logLevel=None, moduleName=None, logFileFlag=false):
 
-    # log_level provided or use defaults ?
-    logLevelCons = os.getenv('log_level_console', logging.WARNING)
+    # log_level provided ?
+    if not logLevel:
+        # no, use default
+        if logFileFlag:
+            logLevel = os.getenv('log_level_console', logging.WARNING)
+        else:
+            logLevel = os.getenv('log_level_file', logging.WARNING)
+        logLevel = getattr(logging, logLevel)
 
     # module name provided ?
     if moduleName is None:
@@ -52,9 +79,18 @@ def setLogLevel(logLevel=None, moduleName=None):
 
     # set log level
     for module in modList:
-        try:
-            lgr = logging.getLogger(module)
-            lgr.setLevel(logLevelCons)
-        except Exception as e:
-            pass
+        # get module'S logger
+        log = logging.getLogger(module)
+        # get all handlers
+        for hdlr in log.handlers[:]:
+            try:
+                # log file or console handler ?
+                if logFileFlag and isinstance(hdlr, logging.FileHandler):
+                    hdlr.setLevel(logLevel)
+                    break
+                elif not logFileFlag:
+                    hdlr.setLevel(logLevel)
+                    break
+            except Exception as e:
+                pass
 

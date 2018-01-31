@@ -1,6 +1,6 @@
 # HPC-Workload-Generator
 
-This project is part of [MIKELANGELO](http://mikelangelo-project.eu) and is a middle-ware between Systems like [Jenkins](https://jenkins.io/) or [Gitlab CI](https://about.gitlab.com/gitlab-ci/) and an HPC System that works with [PBS Torque](http://www.adaptivecomputing.com/products/open-source/torque/).
+This project is part of [MIKELANGELO](http://mikelangelo-project.eu) and is a middle-ware between Systems like [Jenkins](https://jenkins.io/) or [Gitlab CI](https://about.gitlab.com/gitlab-ci/) and an HPC System that works with [PBS Torque](http://www.adaptivecomputing.com/products/open-source/torque/) or [vTorque](https://github.com/mikelangelo-project/vTorque).
 The aim of this project is to give CI tools an API that can be used to interact with a HPC batch system like Torque or for MIKELANGELO [vTorque](https://github.com/mikelangelo-project/), to run HPC jobs as part of the CI tool chain.
 
 ## Table of contents
@@ -65,6 +65,32 @@ sudo -H pip install -r requirements.txt
 pip install -r requirements.txt
 ```
 
+And as a final step create an environments file with the following variables. Those will be applied during runtime. This way credentials and code are clearly separated.
+
+| Environment Varaible       | Type               | Description                    |
+| :---                       | :---               | :---                           |
+| domain                     | string             | Your TLD                       |
+| host                       | string             | HPC front-end                  |
+| user_name                  | string             | HPC user                       |
+| ssh_port                   | integer            | SSH port of HPC front-end      |
+| ssh_key                    | string             | SSH key for HPC front-end      |
+| grafana                    | boolean            | Grafana dashboard available    |
+| grafana_host               | string             | Grafana host                   |
+| grafana_dashborad_name     | string             | Grafana dashboard name         |
+| grafana_dashboard_url      | string             | Grafana dashboard URL          |
+| path_qstat                 | string             | Path to `qstat` on HPC system  |
+| path_qsub                  | string             | Path to `qsub` on HPC system   |
+| path_vsub                  | string             | Path to `vsub` on HPC system   |
+| path_vtorque_log           | string             | Path to vTorque log            |
+| execution_dir              | string             | Path to job execution dir      |
+| poll_time_qstat            | integer            | Time to check job status       |
+| log_file                   | string             | Path to log file               |
+| log_level_file             | string             | Log level for log file         |
+| log_level_console          | string             | Log level for stdout/console   |
+
+You can it either add to the CI user's `~/.bashrc` or as a system-wide solution, place it in /etc/profile.d/scotty_ci.sh
+Mind to make environment variables persistent by the help of `export variable=value`.
+
 Alternately you can use a virtual environment to install the requirements.
 
 ### Example
@@ -81,7 +107,7 @@ If it not work the first time, then you should check the `hpc_backend.cfg`, make
 
 ## License
 
-hpc-workload-gen is distributed under the Apache License 2.0 license.
+This project is distributed under the Apache License 2.0 license.
 
 ## Acknowledgement
 

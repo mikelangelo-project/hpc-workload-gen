@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2016 HLRS, University of Stuttgart
+# Copyright 2018 HLRS, University of Stuttgart
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
 # limitations under the License.
 #
 
-"""Configuration class Object."""
+"""HPC Back-end Configuration"""
 
 # @Author: Uwe Schilling, schilling@hlrs.de
+# @Author: Nico Struckmann, struckmann@hlrs.de
 # @COMPANY: HLRS, University of Stuttgart
-# @Date: 2017-02-21
+# @Date: 2018-01-31
 
 from __future__ import with_statement
 import sys

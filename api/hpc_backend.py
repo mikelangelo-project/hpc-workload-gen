@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #
-# Copyright 2016 HLRS, University of Stuttgart
+#!/usr/bin/env python
+#
+# Copyright 2018 HLRS, University of Stuttgart
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +17,12 @@
 # limitations under the License.
 #
 
-"""Package to hold classes for the connection to HLRS."""
+"""HPC Back-end Connector"""
 
 # @Author: Uwe Schilling, schilling@hlrs.de
+# @Author: Nico Struckmann, struckmann@hlrs.de
 # @COMPANY: HLRS, University of Stuttgart
-# @Date: 2016-11-22
+# @Date: 2018-01-31
 
 import sys
 import os
@@ -280,8 +283,7 @@ class HPCBackend(object):
         try:
             ssh_output = self.ssh_conn(submission_cmd, arg_list)
         except ErrorReturnCode as e:
-            self.logger.error("Error in ssh call:\n{}".format(e))
-            self.logger.error("SSH output:\n%s", ssh_output)
+            self.logger.error("Error '{}' in ssh call:\n{}".format(e.exit_code, e.full_cmd))
             self.logger.error("\n------\n{}\n------".format(sys.exc_info()[0]))
             sys.exit(1)
         self.logger.debug("SSH output:\n%s", ssh_output)
