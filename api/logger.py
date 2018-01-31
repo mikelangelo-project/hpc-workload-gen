@@ -21,7 +21,7 @@ def _initLogger(name):
     # log file
     logFile = os.getenv('log_file');
     if logFile:
-      fh = logging.FileHandler()
+      fh = logging.FileHandler(logFile)
       fh.setLevel(getattr(logging, os.getenv('log_level_file', 'DEBUG')))
 
     # console log (lower level as default)
