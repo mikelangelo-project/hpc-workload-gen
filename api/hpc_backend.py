@@ -52,6 +52,7 @@ class HPCBackend(object):
             self.ssh_conn = ssh.bake('-i', self.hpcConfig.get_value('ssh_key'))
             self.ssh_conn = ssh.bake(self.hpcConfig.get_value('host'))
             setLogLevel()
+            setLogLevel(logging.WARNING, "sh.command")
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)

@@ -46,7 +46,6 @@ def _initLogger(name):
 def setLogLevel(logLevel=None, moduleName=None):
 
     # log_level provided or use defaults ?
-    logLevelFile = os.getenv('log_level_file', logging.DEBUG)
     logLevelCons = os.getenv('log_level_console', logging.WARNING)
 
     # module name provided ?
@@ -63,7 +62,6 @@ def setLogLevel(logLevel=None, moduleName=None):
     for module in modList:
         try:
             lgr = logging.getLogger(module)
-            lgr.setLevel(logLevelFile)
             lgr.setLevel(logLevelCons)
         except Exception as e:
             pass
