@@ -52,8 +52,9 @@ class HPCBackend(object):
             self.ssh_conn = ssh.bake('-p', self.hpcConfig.get_value('ssh_port'))
             self.ssh_conn = ssh.bake('-i', self.hpcConfig.get_value('ssh_key'))
             self.ssh_conn = ssh.bake(self.hpcConfig.get_value('host'))
+            # enforce desired log level
             setLogLevel()
-            setLogLevel(WARNING, "sh.command")
+            getLogger("sh.command").setLevel(WARNING)
         except ErrorReturnCode as e:
             self.logger.error('SSH initialization failed:\n{}'.format(e.stderr))
             sys.exit(1)
@@ -247,7 +248,7 @@ class HPCBackend(object):
         else:
             self.logger.error('Unknown log type, {}'.format(log_type))
             exit(1)
-        #
+        # print log if exists
         if log_path is None:
             self.logger.info('No log for {}'.format(log_type))
         else:
@@ -363,11 +364,13 @@ class HPCBackend(object):
 
 
     def _collect_output(self, experiment):
-        self._print_log('STDIN', experiment)
-        self._print_log('STDERR', experiment)
-        if experiment.is_vm_job():
-            self._print_log('VTORQUE_DEBUG_LOG', experiment)
-
+        # print log ?
+        if logging.getLogger('someLogger').getEffectiveLevel() is logging.DEBUG:
+            self._print_log('STDIN', experiment)
+            self._print_log('STDERR', experiment)
+            if experiment.is_vm_job():
+                self._print_log('VTORQUE_DEBUG_LOG', experiment)
+        # TODO store output in context that is returned to scotty
 
     def _clean_up(self):
         """Remove all files that are generated during the run."""
