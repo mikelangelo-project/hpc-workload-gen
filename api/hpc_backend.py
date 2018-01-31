@@ -26,7 +26,7 @@ import os
 
 from time import time, sleep
 from sh import ssh, ErrorReturnCode, rsync
-from logging import WARNING
+from logging import WARNING, DEBUG
 
 from api.logger import getLogger, setLogLevel
 from api.hpc_config import HPCBackendConfiguration
@@ -365,7 +365,7 @@ class HPCBackend(object):
 
     def _collect_output(self, experiment):
         # print log ?
-        if logging.getLogger('someLogger').getEffectiveLevel() is logging.DEBUG:
+        if getLogger(__name__).getEffectiveLevel() is DEBUG:
             self._print_log('STDIN', experiment)
             self._print_log('STDERR', experiment)
             if experiment.is_vm_job():
