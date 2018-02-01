@@ -46,7 +46,16 @@ def run(context):
     hpcConfig = experimentCfg.getHPCConfig()
     hpcBackend = HPCBackend(hpcConfig)
     # execute the experiment
-    hpcBackend.run_experiment(experimentCfg)
+    try:
+        hpcBackend.run_experiment(experimentCfg)
+    except Exception as e:
+        logger.error(e)
+        # downwards compatibility, thus try/catch if not implemented
+        try:
+            workloadDef.failed()
+        except Exception as ex:
+            pass
+        return None;
     # cache jobID for clean up
     jobID = experimentCfg.get_job_id();
     # construct result paths
